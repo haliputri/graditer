@@ -1,9 +1,11 @@
 {
     "version": 2,
     "routes": [
-      { "src": "/static/(.*)", "dest": "/static/$1" },
-      { "src": "/templates/(.*)", "dest": "/templates/$1" },
+      { "src": "/static/(.*)", "dest": "/static/(.*)" },
+      { "src": "/templates/(.*)", "dest": "/templates/(.*)" },
+      { "src": "/templates/admin/(.*)", "dest": "/templates/admin/(.*)" },
+      { "src": "/templates/components/(.*)", "dest": "/templates/components/(.*)" },
       { "src": "/(.*)", "dest": "/templates/login.html" },
-      { "src": "/(.*)", "dest": "/app.py" }
+      { "src": "/(.*)", "dest": "/aes.py" }
     ]
   }
