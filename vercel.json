@@ -1,14 +1,6 @@
 {
-    "builds" : [
-        {
-            "src" : "aes.py",
-            "use" : "@vercel/python"
-        }
-    ],
-    "routes" : [
-        {
-            "src":"/(.*)",
-            "dest":"aes.py"
-        }
+    "version": 2,
+    "routes": [
+      {"src": "/(.*)", "dest": "/index.html"}
     ]
-}
+  }
