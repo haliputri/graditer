@@ -1,0 +1,3 @@
+FLASK_APP=aes.py
+MONGODB_DB=aes
+MONGODB_HOST=mongodb
