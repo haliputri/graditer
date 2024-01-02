@@ -1,9 +1,22 @@
 {
     "version": 2,
     "builds": [
-        { "src": "aes.py", "use": "@vercel/python" }
+      {
+        "src": "!(templates|static)/**/*.py",
+        "use": "@vercel/python",
+        "config": { "zeroConfig": true }
+      },
+      {
+        "src": "templates/**/*.html",
+        "use": "@vercel/static"
+      },
+      {
+        "src": "static/**/*",
+        "use": "@vercel/static"
+      }
     ],
     "routes": [
-      {"src": "/(.*)", "dest": "/aes.py"}
+      { "src": "/(.*)", "dest": "/aes.py" }
     ]
   }
+  
