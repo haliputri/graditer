@@ -1,0 +1,84 @@
+{% extends "index.html" %} {% block title %}Esai{% endblock title %} {% block
+head %}<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='admin.css') }}"
+/>{% endblock head %} {% block body_content %}
+<body id="body-pd">
+  {% include "components/navigation_user.html" %} {% include
+  "components/userSidebar.html" %}
+  <!--Container Main start-->
+  <!-- <div class="height-100 bg-light">
+        <h4>Daftar Esai</h4>
+    </div> -->
+  <div class="container" style="padding-top: 40px">
+    <nav aria-label="...">
+      <ul class="pagination">
+        {% for q in questions %}
+        <li class="page-item">
+          <a class="page-link" href="#{{ q.question_id }}"
+            >{{ q.question_id }}</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+    <form
+      method="POST"
+      action="{{ url_for('users.result', index=user['index'], index_soal=essay['index']) }}"
+    >
+      {% for q in questions %}
+      <div
+        class="mb-3"
+        id="{{ q.question_id }}"
+        style="background-color: #e4e2ed; padding: 24px; border-radius: 4px"
+      >
+        <div>
+          <label for="soal" name="soal"  data-soal="{{ q.question_id }}"
+            ><b
+              >Soal
+              <span>{{ q.question_id }}</span>
+            </b></label
+          ><br />
+          <input
+            type="text"
+            id="soal"
+            style="
+              width: 100%;
+              padding: 8px;
+              background-color: rgba(255, 255, 255, 0.8);
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            "
+            value="{{ q.question_text }}"
+            readonly
+          /><br />
+        </div>
+        <div class="mt-2 mb-2">
+          <label for="answer"><b>Jawaban</b></label
+          ><br />
+          <textarea
+            type="text"
+            class="answer form-control"
+            id="answer"
+            name="answer_{{ q.question_id }}"
+            style="height: 100px; border-color: black"
+          ></textarea>
+        </div>
+      </div>
+      {% endfor %}
+      <input
+        type="submit"
+        value="Submit"
+        class="btn mb-3"
+        style="
+          background-color: #5b4d99;
+          color: white;
+          font-weight: bold;
+          width: 100px;
+        "
+      />
+    </form>
+  </div>
+  <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+</body>
+{% endblock body_content %}

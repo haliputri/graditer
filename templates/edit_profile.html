@@ -1,0 +1,118 @@
+{% extends "index.html" %}
+{% block title %}
+Profile | Edit Profile
+{% endblock title %}
+{% block head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='admin.css') }}"
+/>
+{% endblock head %}
+{% block body_content %}
+<body id="body-pd">
+    {% include "components/navigation_user.html" %} {% include
+        "components/userSidebar.html" %}
+    <h1 style="font-size: 28px; padding-top: 12px">Edit Profile</h1>
+    <div class="pt-2 pb-4">
+      <div class="p-4" style="background-color: #f7f6fb; border-radius: 8px">
+        <form
+            action="{{ url_for('users.edit_profile', index=user['index']) }}"
+            method="POST"
+          class="row"
+          id="myForm"
+          enctype="multipart/form-data"
+        >
+          <div class="mr-2 mb-3 col-6 mx-auto">
+            <div class="mb-3">
+              <label
+              for="email"
+              class="form-label"
+              style="font-weight: bold"
+              >Email <span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="email"
+              name="email"
+              value="{{ user.email }}"
+            />
+            </div>
+            <div class="mb-3">
+              <label
+              for="password"
+              class="form-label"
+              style="font-weight: bold"
+              >Password</label
+            >
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="********"
+              value="{{ user.value }}"
+            />
+            </div>
+          </div>
+          <div class="ml-2 mb-3 col-6 mx-auto border-start">
+            <div class="mb-3">
+              <label
+              for="name"
+              class="form-label"
+              style="font-weight: bold"
+              >Nama <span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              value="{{ user.name }}"
+            />
+            </div>
+            <div class="mb-3">
+              <label
+              for="npm"
+              class="form-label"
+              style="font-weight: bold"
+              >NPM <span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="npm"
+              name="npm"
+              value="{{ user.npm }}"
+            />
+            </div>
+          </div>
+          <input
+          type="submit"
+          value="Submit"
+          class="btn"
+          style="
+            background-color: #5b4d99;
+            color: white;
+            font-weight: bold;
+            margin-top: 16px;
+          "
+        />
+        </form>
+      </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            {% for category, message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+        </script>
+    {% endif %}
+  {% endwith %}
+    <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+  </body>
+{% endblock body_content %}
+
+
+

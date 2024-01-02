@@ -1,0 +1,421 @@
+{% extends "index.html" %} {% block title %}Admin | Detail{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+<style>
+  .nav {
+    flex-direction: row !important; /* Reset to default value */
+    justify-content: flex-start !important; /* Reset to default value */
+  }
+  @media screen and (min-width: 768px) {
+    .show {
+      width: 100vw; /* 100% of the viewport width */
+    }
+  }
+</style>
+{% endblock head %} {% block body_content %}
+<body id="body-pd">
+  {% include "components/navigation.html" %}
+  <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+    <nav class="nav">
+      <div>
+        <a
+          href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
+          class="nav_logo"
+        >
+          <img
+            src="{{ url_for('static', filename='logo.png') }}"
+            alt=""
+            style="height: 40px"
+        /></a>
+        <div class="nav_list">
+          <a
+            href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
+            class="nav_link"
+          >
+            <i class="bx bx-grid-alt nav_icon"></i
+            ><span class="nav_name">Dashboard</span>
+          </a>
+          <a
+            href="{{ url_for('users.adminEsai', index=user['index']) }}"
+            class="nav_link active"
+          >
+            <i class="bx bx-message-square-detail nav_icon"></i>
+            <span class="nav_name">Essays</span>
+          </a>
+          <a
+            href="{{ url_for('users.adminPengguna', index=user['index']) }}"
+            class="nav_link"
+          >
+            <i class="bx bx-user nav_icon"></i>
+            <span class="nav_name">Users</span>
+          </a>
+        </div>
+      </div>
+      <a href="{{ url_for('users.login') }}" class="nav_link">
+        <i class="bx bx-log-out nav_icon"></i>
+        <span class="nav_name">SignOut</span>
+      </a>
+    </nav>
+  </div>
+  <!--Container Main start-->
+  <!-- <div class="height-100 bg-light">
+          <h4>Daftar Esai</h4>
+      </div> -->
+  <ul class="nav nav-tabs pt-4" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#home"
+        type="button"
+        role="tab"
+        aria-controls="home"
+        aria-selected="true"
+      >
+        Info Esai
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#profile"
+        type="button"
+        role="tab"
+        aria-controls="profile"
+        aria-selected="false"
+      >
+        Pekerjaan Siswa
+      </button>
+    </li>
+  </ul>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div
+      class="tab-pane active"
+      id="home"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+      tabindex="0"
+      style="color: #6a757b"
+    >
+      <div class="mb-3 mt-3">
+        <label for="mata_pelajaran" class="form-label" style="font-weight: bold"
+          >Subjek mata pelajaran <span style="color: red">*</span></label
+        >
+        <input
+          type="text"
+          class="form-control readonly-input"
+          id="mata_pelajaran"
+          name="mata_pelajaran"
+          value="{{ essay.mata_pelajaran }}"
+          readonly
+        />
+      </div>
+      <div class="mb-3">
+        <label for="title" class="form-label" style="font-weight: bold"
+          >Judul Topik <span style="color: red">*</span></label
+        >
+        <input
+          type="text"
+          class="form-control readonly-input"
+          id="judul_topik"
+          name="judul_topik"
+          value="{{ essay.title }}"
+          readonly
+        />
+      </div>
+      <div class="mb-3">
+        <label for="question" class="form-label" style="font-weight: bold"
+          >Pertanyaan terkait topik <span style="color: red">*</span></label
+        >
+        {% if essay.questions %} {% for question in essay.questions %}
+        <input
+          type="text"
+          class="form-control mb-3"
+          value="{{ question.question_text }}"
+          readonly
+        />
+        {% endfor %} {% else %}
+        <input
+          type="text"
+          class="form-control"
+          id="pertanyaan_topik"
+          placeholder="No questions available"
+          disabled
+        />
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        <label for="total-time" class="form-label" style="font-weight: bold"
+          >Total Waktu pengerjaan (menit):
+          <span style="color: red">*</span></label
+        >
+        <p>
+          Total waktu pengerjaan yang diberikan kepada siswa untuk mengerjakan
+          topik ini
+        </p>
+        <input
+          type="number"
+          id="total-time"
+          name="total-time"
+          class="form-control"
+          value="{{ essay.total_time }}"
+          min="1"
+          readonly
+        />
+      </div>
+      <div class="mb-3">
+        <label for="formFile" class="form-label" style="font-weight: bold"
+            >Model Jawaban<span style="color: red">*</span></label
+          >
+          <p>Upload Model (.keras and .h5 only)</p>
+          <span style="color: red">{{ model_name }}</span></label
+        >
+        <p>Masukan max panjang kata</p>
+          <input
+            type="number"
+            id="max_length"
+            name="max_length"
+            class="form-control"
+            min="1"
+            style="width: 100px"
+            value="{{ essay.max_length }}"
+            disabled
+          />
+      </div>
+    </div>
+    <div
+      class="tab-pane mt-2 mb-2"
+      id="profile"
+      role="tabpanel"
+      aria-labelledby="profile-tab"
+      tabindex="0"
+      style="color: #212529; width: 100%"
+    >
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+        style="
+          background-color: #5b4d99;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+          color: white;
+        "
+      >
+        Daftar Mahasiswa
+      </button>
+      <div
+        class="modal fade"
+        id="staticBackdrop"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div
+          id="modalBody"
+          class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                Daftar Siswa
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <form
+              action="{{ url_for('users.student_work_topic', index=user['index'], index_soal=essay['index']) }}"
+              method="POST"
+              id="userForm"
+            >
+              <div class="modal-body">
+                <div class="row" style="padding: 1rem">
+                  <table>
+                    {% for user in nisw %}
+                    <tr>
+                      <td style="border: 1px solid #ccc; padding: 0.5rem">
+                        <input
+                          type="checkbox"
+                          id="myCheckbox_{{ user.id }}"
+                          name="selectedUsers"
+                          value="{{ user.index }}"
+                          class="me-3"
+                        />
+                      </td>
+                      <td
+                        style="border: 1px solid #ccc; padding: 0.5rem"
+                        id="name"
+                        name="name"
+                      >
+                        {{ user.email }}
+                      </td>
+                      <td
+                        style="border: 1px solid #ccc; padding: 0.5rem"
+                        id="npm"
+                        name="npm"
+                      >
+                        {{ user.npm }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="submitBtn">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <table id="tableTerdaftar" class="table terdaftar">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Nama Siswa</th>
+            <th scope="col">Nilai Akhir</th>
+            <th scope="col">Pertanyaan</th>
+            <th scope="col">Jawaban</th>
+            <th scope="col">Hasil Prediksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sw in student_work %} {% for qt in questions %} 
+          <tr>
+            {% if loop.index == 1 %} 
+              <td>
+                <button
+                  class="btn btn-danger btn-sm rounded-0 deleteButton"
+                  type="button"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="Delete"
+                  data-item-id="{{ sw.user_index }}"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+              <td id="name">
+                {{ sw.name }}
+              </td>
+              <td id="point">{{ sw.result_in_tens }}</td>
+            {% else %}
+              <td></td>
+              {# Empty cell for "No" when not needed #}
+              <td></td>
+              <td></td>
+              {# Empty cell for "Name" when not needed #} {% endif %}
+              {% for ad in sw.answer_data %}
+              {% if qt.question_id == ad.question_id %}
+                <td id="pertanyaan" data-item-id="{{ qt.question_id }}">{{ qt.question_text }}</td>
+                <td id="jawaban">{{ ad.answer }}</td>
+                <td id="predict">{{ ad.predicted_score }}</td>
+            {% endif %}
+          {% endfor %}
+          </tr>
+          {% endfor %} {% endfor %} 
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    const exampleModal = document.getElementById("exampleModal");
+    if (exampleModal) {
+      exampleModal.addEventListener("show.bs.modal", (event) => {
+        // Button that triggered the modal
+        const button = event.relatedTarget;
+        // Extract info from data-bs-* attributes
+        const recipient = button.getAttribute("data-bs-whatever");
+        // If necessary, you could initiate an Ajax request here
+        // and then do the updating in a callback.
+
+        // Update the modal's content.
+        const modalTitle = exampleModal.querySelector(".modal-title");
+        const modalBodyInput = exampleModal.querySelector(".modal-body input");
+
+        modalTitle.textContent = `New message to ${recipient}`;
+        modalBodyInput.value = recipient;
+      });
+    }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("#submitBtn").click(function () {
+        // Get additional data from the page
+        var additionalData = {
+          name: $("#name").val(), // Assuming you have an element with id="userName"
+          npm: $("#npm").val(), // Assuming you have an element with id="userNPM"
+          question_id: $("#pertanyaan").data("item-id"),
+        };
+
+        // Combine additional data with form data
+        var formData = $("#userForm").serializeArray();
+        $.each(additionalData, function (key, value) {
+          formData.push({ name: key, value: value });
+        });
+
+        // Submit the form using AJAX
+        $.ajax({
+          type: "POST",
+          url: $("#userForm").attr("action"), // Use the form action attribute
+          data: formData,
+          success: function (response) {
+            // Handle success response
+            console.log(response);
+          },
+          error: function (error) {
+            // Handle error response
+            console.error(error);
+          },
+        });
+        $("#staticBackdrop").modal("hide");
+        location.reload();
+      });
+    });
+    
+    $(document).ready(function () {
+      $(".deleteButton").click(function () {
+        var itemId = $(this).data("item-id");
+
+        if (confirm("Are you sure you want to delete this user?")) {
+          $.ajax({
+            url: "{{ url_for('users.student_work_topic', index=user['index'], index_soal=essay['index']) }}/"+itemId,
+            type: "DELETE",
+            success: function (response) {
+              // Handle success (e.g., remove the deleted item from the UI)
+              console.log(response);
+              // Reload or update your UI as needed
+              location.reload();
+            },
+            error: function (error) {
+              // Handle error
+              console.error(error);
+            },
+          });
+        }
+        location.reload();
+      });
+    });
+  </script>
+  <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+</body>
+{% endblock body_content %}

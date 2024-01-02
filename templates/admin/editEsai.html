@@ -1,0 +1,307 @@
+{% extends "index.html" %}
+{% block title %}
+Admin | Edit Esai
+{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+{% endblock head %}
+{% block body_content %}
+<body id="body-pd">
+    {% include "components/navigation.html" %}
+    <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+      <nav class="nav">
+        <div>
+          <a
+            href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
+            class="nav_logo"
+          >
+            <img
+              src="{{ url_for('static', filename='logo.png') }}"
+              alt=""
+              style="height: 40px"
+          /></a>
+          <div class="nav_list">
+            <a
+              href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
+              class="nav_link"
+            >
+              <i class="bx bx-grid-alt nav_icon"></i
+              ><span class="nav_name">Dashboard</span>
+            </a>
+            <a
+              href="{{ url_for('users.adminEsai', index=user['index']) }}"
+              class="nav_link active"
+            >
+              <i class="bx bx-message-square-detail nav_icon"></i>
+              <span class="nav_name">Essays</span>
+            </a>
+            <a
+              href="{{ url_for('users.adminPengguna', index=user['index']) }}"
+              class="nav_link"
+            >
+              <i class="bx bx-user nav_icon"></i>
+              <span class="nav_name">Users</span>
+            </a>
+          </div>
+        </div>
+        <a href="{{ url_for('users.login') }}" class="nav_link">
+          <i class="bx bx-log-out nav_icon"></i>
+          <span class="nav_name">SignOut</span>
+        </a>
+      </nav>
+    </div>
+    <!--Container Main start-->
+    <!-- <div class="height-100 bg-light">
+          <h4>Daftar Esai</h4>
+      </div> -->
+    <h1 style="font-size: 28px; padding-top: 12px">Edit Esai</h1>
+    <div class="pt-2 pb-4">
+      <div class="p-4" style="background-color: #f7f6fb; border-radius: 8px">
+        <form
+          action="{{ url_for('users.edit_esai', index=user['index'], index_soal=essay['index']) }}"
+          method="POST"
+          class="col-12"
+          id="myForm"
+          enctype="multipart/form-data"
+          onsubmit="validateForm()"
+        >
+          <div class="mb-3">
+            <label
+              for="mata_pelajaran"
+              class="form-label"
+              style="font-weight: bold"
+              >Subjek mata pelajaran <span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="mata_pelajaran"
+              name="mata_pelajaran"
+              value="{{ essay.mata_pelajaran }}"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="title" class="form-label" style="font-weight: bold"
+              >Judul Topik <span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              name="title"
+              value="{{ essay.title }}"
+            />
+          </div>
+          <label for="question" class="form-label" style="font-weight: bold"
+            >Pertanyaan terkait topik <span style="color: red">*</span></label
+          >
+          <p>Harus ada minimal 1 pertanyaan agar dapat di submit</p>
+          {% for q in essay.questions %}
+          <div id="question-container-main">
+            <div id="question-container" style="display: flex; width: 100%">
+                <div class="mb-3" style="width: 80%; display: flex">
+                  <input
+                    type="text"
+                    class="form-control ml-2"
+                    id="question"
+                    name="questions[]"
+                    value="{{ q.question_text }}"
+                  />
+                </div>
+                <div
+                  class="mb-3"
+                  style="
+                    width: 20%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                  "
+                >
+                  <button
+                    type="button"
+                    class="btn"
+                    style="background-color: red; height: 100%; color: white"
+                    onclick="addRemove()"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+          </div>
+          {% endfor %}
+  
+          <button
+            type="button"
+            class="btn"
+            onclick="addQuestion()"
+            style="
+              background-color: white;
+              margin-bottom: 2rem;
+              color: #303030;
+              border: 1px dashed #333;
+            "
+          >
+            Tambah lebih banyak +
+          </button>
+          <script>
+            function addRemove() {
+              var questionContainer =
+                document.getElementById("question-container");
+  
+              if (questionContainer.children.length == 1) {
+                // Show an alert if there is at least one question
+                alert("Setidaknya buat satu pertanyaan");
+              } else {
+                // Perform the removal action if there are no questions
+                questionContainer.parentNode.removeChild(questionContainer);
+              }
+            }
+            function addQuestion() {
+              var questionContainer = document.getElementById(
+                "question-container-main"
+              );
+  
+              // Create a new question box
+              var newQuestionBox = document.createElement("div");
+              newQuestionBox.style.display = "flex";
+              newQuestionBox.style.width = "100%";
+              newQuestionBox.style.marginBottom = "1rem";
+  
+              var inputField = document.createElement("input");
+              inputField.type = "text";
+              inputField.className = "form-control ml-2";
+              inputField.placeholder = "Pertanyaan";
+              inputField.name = "questions[]"; // Use array notation for the input name
+              inputField.style.width = "80%";
+              inputField.style.display = "flex";
+  
+              var removeButtonContainer = document.createElement("div");
+              removeButtonContainer.style.width = "20%";
+              removeButtonContainer.style.display = "flex";
+              removeButtonContainer.style.alignItems = "center";
+              removeButtonContainer.style.justifyContent = "flex-end";
+  
+              var removeButton = document.createElement("button");
+              removeButton.type = "button";
+              removeButton.className = "btn";
+              removeButton.style.backgroundColor = "red";
+              removeButton.style.height = "100%";
+              removeButton.style.color = "white";
+              removeButton.textContent = "Remove";
+  
+              removeButton.addEventListener("click", function () {
+                // Remove the question box when the remove button is clicked
+                questionContainer.removeChild(newQuestionBox);
+              });
+  
+              newQuestionBox.appendChild(inputField);
+              removeButtonContainer.appendChild(removeButton);
+              newQuestionBox.appendChild(removeButtonContainer);
+  
+              // Append the new question box to the container
+              questionContainer.appendChild(newQuestionBox);
+            }
+  
+            function removeQuestion(button) {
+              var questionContainer =
+                document.getElementById("question-container");
+              var questionBox = button.closest(
+                'div[style="display:flex;width:100%;"]'
+              );
+  
+              // Remove the question box
+              questionContainer.removeChild(questionBox);
+              questionContainer.removeChild(questionContainer);
+            }
+          </script>
+          <div class="mb-3">
+            <label for="total-time" class="form-label" style="font-weight: bold"
+              >Total Waktu pengerjaan (menit):
+              <span style="color: red">*</span></label
+            >
+            <p>
+              Total waktu pengerjaan yang diberikan kepada siswa untuk mengerjakan
+              topik ini
+            </p>
+            <input
+              type="number"
+              id="total-time"
+              name="total-time"
+              class="form-control"
+              value="{{ essay.total_time }}"
+              min="1"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label" style="font-weight: bold"
+              >Model Jawaban<span style="color: red">*</span></label
+            >
+            <input
+              class="form-control mb-3"
+              type="file"
+              id="formFile"
+              name="formFile"
+              accept=".keras, .h5"
+              onchange="validateFile()"
+            />
+            <p>Masukan max panjang kata <span style="color: red">*</span></p>
+            <input
+              type="number"
+              id="max_length"
+              name="max_length"
+              class="form-control"
+              min="1"
+              style="width: 100px"
+              value="{{ essay.max_length }}"
+            />
+          </div>
+          <input
+            type="submit"
+            value="Update"
+            class="btn"
+            style="
+              background-color: #5b4d99;
+              color: white;
+              font-weight: bold;
+              width: 100px;
+              margin-top: 16px;
+            "
+          />
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %}
+          <script>
+            {% for category, message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+          </script>
+          {% endif %} {% endwith %}
+          <script>
+            function validateFile() {
+              var fileInput = document.getElementById("formFile");
+              var fileName = fileInput.value;
+  
+              // Check if the selected file has a valid extension
+              if (
+                fileName &&
+                !(fileName.endsWith(".keras") || fileName.endsWith(".h5"))
+              ) {
+                alert("Invalid file type. Please upload a .keras or .h5 file.");
+                fileInput.value = ""; // Clear the file input
+              }
+            }
+          </script>
+        </form>
+      </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <script>
+          {% for category, message in messages %}
+              alert("{{ message }}");
+          {% endfor %}
+        </script>
+        {% endif %} {% endwith %}
+    <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+  </body>
+{% endblock body_content %}
+

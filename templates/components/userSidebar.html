@@ -1,0 +1,19 @@
+<div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+  <nav class="nav">
+    <div>
+      <a href="{{ url_for('users.profile_user_by_index', index=user['index']) }}" class="nav_logo">
+        <img src="{{ url_for('static', filename="logo.png") }}" alt="" style="height: 40px"
+      /></a>
+      <div class="nav_list">
+        <a href="{{ url_for('users.profile_user_by_index', index=user['index']) }}" class="nav_link active">
+          <i class="bx bx-grid-alt nav_icon"></i
+          ><span class="nav_name">Dashboard</span>
+        </a>
+      </div>
+    </div>
+    <a href="{{ url_for('users.login')}}" class="nav_link">
+      <i class="bx bx-log-out nav_icon"></i>
+      <span class="nav_name">SignOut</span>
+    </a>
+  </nav>
+</div>

@@ -1,0 +1,76 @@
+{% extends "index.html" %} 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+{% endblock head %} 
+{% block title %}Dashboard | Admin{% endblock title %} 
+{% block body_content %}
+<body id="body-pd">
+  {% include "components/navigation.html" %} 
+<div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+  <nav class="nav">
+    <div>
+      <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
+      /></a>
+      <div class="nav_list">
+        <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link active">
+          <i class="bx bx-grid-alt nav_icon"></i
+          ><span class="nav_name">Dashboard</span>
+        </a>
+        <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link">
+          <i class="bx bx-message-square-detail nav_icon"></i>
+          <span class="nav_name">Essays</span>
+        </a>
+        <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link">
+          <i class="bx bx-user nav_icon"></i>
+          <span class="nav_name">Users</span>
+        </a>
+      </div>
+    </div>
+    <a href="{{ url_for('users.login') }}" class="nav_link">
+      <i class="bx bx-log-out nav_icon"></i>
+      <span class="nav_name">SignOut</span>
+    </a>
+  </nav>
+</div>
+<!--Container Main start-->
+<!-- <div class="height-100 bg-light">
+        <h4>Daftar Esai</h4>
+    </div> -->
+<div style="padding-top: 2rem">
+  <div class="row" style="margin-bottom: 2rem">
+    <div class="card col-sm-8" style="background-color: #e4e2ed">
+      <div class="card-body">
+        <h5 class="card-title">Daftar Esai</h5>
+        <p class="card-text">
+          Kumpulan esai yang telah di daftarkan dan siap diisi oleh siswa.
+        </p>
+        <a
+          href="{{ url_for('users.adminEsai', index=user['index']) }}"
+          class="btn"
+          style="background-color: #5b4d99; color: white"
+          >Selanjutnya</a
+        >
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="card col-sm-8" style="background-color: #e4e2ed">
+      <div class="card-body">
+        <h5 class="card-title">Daftar User</h5>
+        <p class="card-text">
+          Kumpulan akun pengguna yang telah didaftarkan untuk mengisi esai.
+        </p>
+        <a
+          href="{{ url_for('users.adminPengguna', index=user['index']) }}"
+          class="btn"
+          style="background-color: #5b4d99; color: white"
+          >Selanjutnya</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+</body>
+{% endblock body_content %}

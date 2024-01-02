@@ -1,0 +1,14 @@
+<header class="header" id="header">
+    <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle" style="color:#5B4D99;"></i> </div>
+    <div style="display: flex; align-items: center; height: 100%;margin-top:auto; ">
+        <a href="{{ url_for('users.edit_pengguna', index=2, index_user=user['index']) }}" style="margin-top: auto; margin-bottom:auto;margin-right: 1rem; display: flex; background-color:#5B4D99;padding:.1rem 1rem; border-radius:4px;">
+            <div style="display: flex; align-items: center;">
+                <p style="font-weight: bold; margin: 0; color:white;">Hi, {{ user_name }}</p>
+            </div>
+            <div class="header_img">
+                <iconify-icon icon="carbon:user-avatar" style="color: white;" width="32" height="32"></iconify-icon>
+            </div>
+        </a>
+    </div>
+</header>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>

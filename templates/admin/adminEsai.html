@@ -1,0 +1,130 @@
+{% extends "index.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+{% endblock head %} 
+{% block title %}Admin | Esai{% endblock title %} 
+{% block body_content %} 
+<body id="body-pd">
+  {% include "components/navigation.html" %} 
+  <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+    <nav class="nav">
+      <div>
+        <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
+        /></a>
+        <div class="nav_list">
+          <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link">
+            <i class="bx bx-grid-alt nav_icon"></i
+            ><span class="nav_name">Dashboard</span>
+          </a>
+          <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link active">
+            <i class="bx bx-message-square-detail nav_icon"></i>
+            <span class="nav_name">Essays</span>
+          </a>
+          <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link">
+            <i class="bx bx-user nav_icon"></i>
+            <span class="nav_name">Users</span>
+          </a>
+        </div>
+      </div>
+      <a href="{{ url_for('users.login') }}" class="nav_link">
+        <i class="bx bx-log-out nav_icon"></i>
+        <span class="nav_name">SignOut</span>
+      </a>
+    </nav>
+  </div>
+  <!--Container Main start-->
+  <!-- <div class="height-100 bg-light">
+        <h4>Daftar Esai</h4>
+    </div> -->
+
+    <a href="{{ url_for('users.tambahEsai', index=user['index']) }}">
+      <button
+    type="button"
+    class="btn"
+    style="
+      background-color: #5b4d99;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      color: white;
+    "
+  >
+    Tambah Esai
+  </button>
+  </a>
+  
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">No.</th>
+        <th scope="col">Topik Esai</th>
+        <th scope="col">Mata Pelajaran</th>
+        <th scope="col">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for essay in essays %}
+      <tr>
+        <th scope="row">{{ loop.index }}</th>
+        <td>{{ essay.title }}</td>
+        <td>{{ essay.mata_pelajaran }}</td>
+        <td>
+            <ul class="list-inline m-0">
+                <li class="list-inline-item">
+                  <a href="{{ url_for('users.detail_esai', index=user['index'], index_soal=essay['index']) }}">
+                    <button class="btn btn-warning btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Caution">
+                      <i class="fa fa-exclamation"></i>
+                  </button>
+                </a>
+                </li>
+                <li class="list-inline-item">
+                  <a href="{{ url_for('users.edit_esai', index=user['index'], index_soal=essay['index']) }}">
+                    <button class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit">
+                      <i class="fa fa-edit"></i>
+                  </button>
+                </a>
+                </li>
+                <li class="list-inline-item">
+                  <button class="btn btn-danger btn-sm rounded-0 deleteButton"
+                          type="button"
+                          data-toggle="tooltip"
+                          data-placement="top"
+                          title="Delete"
+                          data-id-delete="{{ essay.index }}">
+                      <i class="fa fa-trash"></i>
+                  </button>
+                </li>
+            </ul>
+        </td>
+    </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $(".deleteButton").click(function () {
+          var id_delete = $(this).data("id-delete");
+  
+          if (confirm("Are you sure you want to delete this essay?")) {
+              $.ajax({
+                  url: "{{ url_for('users.delete_essay', index=user['index'], index_soal="") }}"+id_delete ,
+                  type: "DELETE",
+                  success: function (response) {
+                      // Handle success (e.g., remove the deleted item from the UI)
+                      console.log(response);
+                      // Reload or update your UI as needed
+                  },
+                  error: function (error) {
+                      // Handle error
+                      console.error(error);
+                  },
+              });
+              window.location.reload();
+          }
+      });
+    });
+  </script>
+</body>
+{% endblock body_content %}

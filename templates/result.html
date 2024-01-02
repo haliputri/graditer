@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+{% block title %}Hasil{% endblock title %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">{% endblock head %}
+{% block body_content %}
+<body id="body-pd">
+  {% include "components/navigation_user.html" %}
+  {% include "components/userSidebar.html" %}
+  <!--Container Main start-->
+  <!-- <div class="height-100 bg-light">
+        <h4>Daftar Esai</h4>
+    </div> -->
+  <div style="padding-top:2rem;">
+    <div class="row" style="margin-bottom: 2rem;">
+      <div class="card col-sm-8" style="background-color:#e4e2ed;">
+        <div class="card-body">
+          <h5 class="card-title">Pengerjaan Soal Esai</h5>
+          <p class="card-text">Topik Esai : {{ essay.title }}</p>
+          <h5 class="fw-bold mt-2">Hasil Test : {{ temp.result_in_tens }}</h5>
+          <ul>
+          </ul>
+          <a href="{{ url_for('users.profile_user_by_index', index=user['index']) }}">
+            <button
+              type="button"
+              class="btn"
+              style="background-color: #5b4d99; height: 42px; color: white"
+            >
+              Selesai
+            </button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+</body>
+{% endblock body_content %}

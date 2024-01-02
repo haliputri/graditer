@@ -1,0 +1,70 @@
+{% extends "index.html" %} 
+{% block title %}Dashboard | User{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+<style>
+  .hover-link {
+      color: black;
+      font-weight: bold;
+      transition: opacity 0.3s; /* Add a smooth transition effect */
+  }
+
+  .hover-link:hover {
+      opacity: 0.8;
+  }
+</style>
+{% endblock head %}
+{% block body_content %}
+<body id="body-pd">
+  {% include "components/navigation_user.html" %} {% include
+  "components/userSidebar.html" %}
+  <!--Container Main start-->
+  <!-- <div class="height-100 bg-light">
+        <h4>Daftar Esai</h4>
+    </div> -->
+  <div style="padding-top: 2rem">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">No.</th>
+          <th scope="col">Topik Tugas</th>
+          <th scope="col">Mata pelajaran</th>
+          <th scope="col">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for essay in essays %}
+        <tr>
+          <td scope="row">{{ loop.index }}</td>
+          <td>
+            <a class="hover-link" href="{{ url_for('users.result', index=user['index'], index_soal=essay['index']) }}">{{ essay.title }}</a>
+          </td>
+          <td>{{ essay.mata_pelajaran }}</td>
+          <td>
+            {% if essay.index in essay_done %}
+                <p><b style="color:green">SELESAI</b></p>
+            {% else %}
+                <a href="{{ url_for('users.introSoal', index=user['index'], index_soal=essay['index']) }}">
+                    <button type="button" class="btn" style="background-color: #5b4d99; height: 42px; color: white">
+                        Kerjakan
+                    </button>
+                </a>
+            {% endif %}
+        </td>        
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+  <script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          alert('{{ message }}');
+        {% endif %}
+      {% endfor %}
+    {% endwith %}
+</script>
+</body>
+{% endblock body_content %}

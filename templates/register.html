@@ -1,0 +1,64 @@
+{% extends "index.html" %}
+{% block title %}Register{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="../static/style.css" />
+{% endblock head %}
+{% block body_content %}
+<body>
+    <nav class="navbar" style="background-color:#5B4D99;">
+      <div class="container-fluid mx-4 d-flex align-items-center">
+        <a>
+          <img src="../static/logo.png" alt="" style="height:40px">
+        </a>
+        <p style="color:white; font-weight:bold; margin: 0 auto;">Automatic Essay Scoring Tool</p>
+      </div>
+    </nav>
+    <div class="mx-4" style="display:flex;">
+      <div class="hero-login"
+        style="margin-top: 50px;background-color:white;padding-bottom:40px; width:560px; margin-left:40px; margin-right:40px; border-radius:8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+        <div style="text-align:center;margin-top:50px;">
+          <h4 class="mb-0">Registrasi Account</h4>
+          <p>Please enter your information here</p>
+        </div>
+        <form action="/register" method="POST">
+          <div class="container" style="padding-left: 40px; padding-right:40px;">
+            <div class="mb-2">
+              <label for="email" style="font-weight:600;">Email</label><br>
+              <input type="text" placeholder="Enter Email" name="email" required
+                style="width:100%; height:40px; border-radius:4px; padding:8px;margin-top:4px;border: 1px solid #ccc;">
+            </div>
+            <div class="mb-2">
+              <label for="password" style="font-weight:600;">Password</label><br>
+              <input type="password" placeholder="Enter Password" name="password" required
+                style="width:100%; height:40px; border-radius:4px; padding:8px;margin-top:4px;border: 1px solid #ccc;">
+            </div>
+            <div class="mb-4">
+                <label for="confirm_password" style="font-weight:600;">Confirm Password</label><br>
+                <input type="password" placeholder="Enter Password" name="confirm_password" required
+                  style="width:100%; height:40px; border-radius:4px; padding:8px;margin-top:4px;border: 1px solid #ccc;">
+              </div>
+            <button type="submit"
+              style="width:100%; height:40px; border-radius:4px; background-color: #5B4D99; color:white; border:none;">Sign Up</button>
+              
+              <p class="mt-4" style="justify-content:center;">If you already have account, <span><a  style=" text-decoration: none;font-weight:bold; color:#5B4D99;" href="/">Login</a></span></p>
+            </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <script>
+                {% for category, message in messages %}
+                    alert("{{ message }}");
+                {% endfor %}
+                </script>
+            {% endif %}
+            {% endwith %}
+        </form>
+      </div>
+      <div>
+        <img src="../static/19.png" alt="" height="450px" style="margin-top:50px">
+      </div>
+    </div>
+    <!-- <footer style="height: 90px; background-color:#5B4D99"> -->
+  
+    </footer>
+  </body>
+{% endblock body_content %}
