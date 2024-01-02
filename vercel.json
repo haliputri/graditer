@@ -1,6 +1,6 @@
 {
     "version": 2,
     "routes": [
-      { "src": "/(.*)", "dest": "/.vercel/build/aes.py" }
+      { "src": "/(.*)", "dest": "/" }
     ]
   }
