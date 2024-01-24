@@ -96,13 +96,18 @@
         <div id="question-container-main">
           <div id="question-container" style="display: flex; width: 100%">
             <div class="mb-3" style="width: 80%; display: flex">
-              <input
-                type="text"
+              <select
                 class="form-control ml-2"
                 id="question"
                 name="questions[]"
-                placeholder="Pertanyaan"
-              />
+                placeholder="Pilih Pertanyaan"
+                onchange="checkDuplicate(this)"
+              >
+                <option value="" selected disabled>Pilih Pertanyaan</option>
+                <option value="soal1">Soal 1</option>
+                <option value="soal2">Soal 2</option>
+                <option value="soal3">Soal 3</option>
+              </select>
             </div>
             <div
               class="mb-3"
@@ -139,6 +144,19 @@
           Tambah lebih banyak +
         </button>
         <script>
+          var selectedQuestions = [];
+
+          function checkDuplicate(selectElement) {
+            var selectedOption = selectElement.value;
+            
+            if (selectedQuestions.includes(selectedOption)) {
+              alert("Soal ini sudah dipilih. Silakan pilih soal lain.");
+              selectElement.value = "";
+            } else {
+              selectedQuestions.push(selectedOption);
+            }
+          }
+          
           function addRemove() {
             var questionContainer =
               document.getElementById("question-container");

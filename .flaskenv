@@ -1,4 +1,4 @@
-FLASK_APP=aes.py
+FLASK_APP=app.py
 MONGODB_DB=aes
 MONGODB_HOST=mongodb
 FLASK_ENV=development

@@ -285,6 +285,8 @@
         <thead>
           <tr>
             <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
             <th scope="col">Nama Siswa</th>
             <th scope="col">Nilai Akhir</th>
             <th scope="col">Pertanyaan</th>
@@ -303,10 +305,75 @@
                   data-toggle="tooltip"
                   data-placement="top"
                   title="Delete"
-                  data-item-id="{{ sw.user_index }}"
+                  data-item-id="{{ sw.index_essay }}"
+                  data-user-id="{{ sw.user_index }}"
                 >
                   <i class="fa fa-trash"></i>
                 </button>
+              </td>
+              <td>
+                <li class="list-inline-item">
+                  <button 
+                      class="btn btn-success btn-sm rounded-0 editButton" 
+                      type="button" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#staticUpdate-{{ sw.user_index }}"
+                      id="editButton"
+                  >
+                      <i class="fa fa-edit"></i>
+                  </button>
+              </li>
+              
+              <!-- Modal -->
+              <div class="modal fade" id="staticUpdate-{{ sw.user_index }}" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                      <div class="modal-content">
+                          <!-- Modal header -->
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Edit Jawaban</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+              
+                          <!-- Modal body -->
+                          {% for qt in questions %}
+                          {% for ad in sw.answer_data %}
+                          <div class="modal-body">
+                           
+                              {% if qt.question_id == ad.question_id %}
+                                <div class="mb-2 question_container">
+                                  <p class="mb-0" id="pertanyaan" data-item-id="{{ qt.question_id }}" >{{ qt.question_text }}</p>
+                                  <textarea type="text" class="form-control" id="jawaban" data-answer-id="{{ ad.answer }}" style="height:100px">{{ ad.answer }}</textarea>
+                                </div>
+                                {% endif %} 
+                          </div>
+              
+                          <!-- Modal footer -->
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary" id="updateBtn" data-item-id="{{ sw.index_essay }}"
+                              data-user-id="{{ sw.user_index }}">Save changes</button>
+                          </div>
+                          {% endfor %}
+                          {% endfor %}
+                      </div>
+                  </div>
+              </div>
+              </td>
+              
+              <td>
+                <li class="list-inline-item">
+                  <button 
+                  class="btn btn-warning btn-sm rounded-0 restartButton" 
+                  type="button" 
+                  data-toggle="tooltip" 
+                  data-placement="top" 
+                  title="Restart"
+                  data-item-id="{{ sw.index_essay }}"
+                  data-user-id="{{ sw.user_index }}"
+                  >
+                    <i class="fa fa-rotate-right"></i>
+                </button>
+                </li>
               </td>
               <td id="name">
                 {{ sw.name }}
@@ -315,6 +382,8 @@
             {% else %}
               <td></td>
               {# Empty cell for "No" when not needed #}
+              <td></td>
+              <td></td>
               <td></td>
               <td></td>
               {# Empty cell for "Name" when not needed #} {% endif %}
@@ -337,24 +406,7 @@
     crossorigin="anonymous"
   ></script>
   <script>
-    const exampleModal = document.getElementById("exampleModal");
-    if (exampleModal) {
-      exampleModal.addEventListener("show.bs.modal", (event) => {
-        // Button that triggered the modal
-        const button = event.relatedTarget;
-        // Extract info from data-bs-* attributes
-        const recipient = button.getAttribute("data-bs-whatever");
-        // If necessary, you could initiate an Ajax request here
-        // and then do the updating in a callback.
-
-        // Update the modal's content.
-        const modalTitle = exampleModal.querySelector(".modal-title");
-        const modalBodyInput = exampleModal.querySelector(".modal-body input");
-
-        modalTitle.textContent = `New message to ${recipient}`;
-        modalBodyInput.value = recipient;
-      });
-    }
+    
   </script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
@@ -395,10 +447,11 @@
     $(document).ready(function () {
       $(".deleteButton").click(function () {
         var itemId = $(this).data("item-id");
+        var userId = $(this).data("user-id");
 
         if (confirm("Are you sure you want to delete this user?")) {
           $.ajax({
-            url: "{{ url_for('users.student_work_topic', index=user['index'], index_soal=essay['index']) }}/"+itemId,
+            url: "{{ url_for('users.delete_sw', index=user['index'], essay_index="", user_index="") }}"+itemId+ "/" + userId,
             type: "DELETE",
             success: function (response) {
               // Handle success (e.g., remove the deleted item from the UI)
@@ -412,6 +465,70 @@
             },
           });
         }
+        location.reload();
+      });
+    });
+
+    $(document).ready(function () {
+      $(".restartButton").click(function () {
+        var itemId = $(this).data("item-id");
+        var userId = $(this).data("user-id");
+    
+        if (confirm("Are you sure you want to restart this user?")) {
+          $.ajax({
+            url: "{{ url_for('users.ulang_esai', index=user['index'], essay_index="", user_index="") }}"+ itemId+'/' + userId,
+            type: "POST",
+            success: function (response) {
+              // Handle success (e.g., remove the deleted item from the UI)
+              console.log(response);
+              // Reload or update your UI as needed
+              location.reload();
+            },
+            error: function (error) {
+              // Handle error
+              console.error(error);
+            },
+          });
+        }
+        location.reload();
+      });
+    });
+
+    $(document).ready(function () {
+      $("#updateBtn").click(function () {
+        // Get additional data from the page
+        var itemId = $(this).data("item-id");
+        var userId = $(this).data("user-id");
+        var questionAnswers = [];
+        
+        $(".question_container").each(function () {
+          var questionId = $(this).find("#pertanyaan").data("item-id");
+          var answer = $(this).find("#jawaban").val();
+
+          // Add question-answer pair to the array
+          questionAnswers.push({
+              questionId: questionId,
+              answer: answer
+          });
+          console.log(itemId, userId);
+      });
+
+        // Submit the form using AJAX
+        $.ajax({
+          type: "POST",
+          url: "{{ url_for('users.update_answer', index=user['index'], index_soal="", user_index="") }}"+ itemId+'/' + userId, // Use the form action attribute
+          data: JSON.stringify({ questionAnswers: questionAnswers }),  // Corrected property name to 'data'
+          contentType: 'application/json;charset=UTF-8',  // Specify content type as JSON
+          success: function (response) {
+              // Handle success response
+              console.log(response);
+          },
+          error: function (error) {
+              // Handle error response
+              console.error(error);
+          },
+      });
+        $("#staticBackdrop").modal("hide");
         location.reload();
       });
     });
