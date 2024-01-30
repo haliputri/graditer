@@ -326,37 +326,37 @@
               
               <!-- Modal -->
               <div class="modal fade" id="staticUpdate-{{ sw.user_index }}" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                      <div class="modal-content">
-                          <!-- Modal header -->
-                          <div class="modal-header">
-                              <h5 class="modal-title" id="exampleModalLabel">Edit Jawaban</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-              
-                          <!-- Modal body -->
-                          {% for qt in questions %}
-                          {% for ad in sw.answer_data %}
-                          <div class="modal-body">
-                           
-                              {% if qt.question_id == ad.question_id %}
-                                <div class="mb-2 question_container">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                      <!-- Modal header -->
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Edit Jawaban</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+          
+                      <!-- Modal body -->
+                      <div class="modal-body">
+                           {% for qt in questions %}
+                        {% for ad in sw.answer_data %}
+                        {% if qt.question_id == ad.question_id %}
+                                <div class="mb-2 question_container-{{ sw.user_index }}">
                                   <p class="mb-0" id="pertanyaan" data-item-id="{{ qt.question_id }}" >{{ qt.question_text }}</p>
                                   <textarea type="text" class="form-control" id="jawaban" data-answer-id="{{ ad.answer }}" style="height:100px">{{ ad.answer }}</textarea>
                                 </div>
                                 {% endif %} 
-                          </div>
-              
-                          <!-- Modal footer -->
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="button" class="btn btn-primary" id="updateBtn" data-item-id="{{ sw.index_essay }}"
-                              data-user-id="{{ sw.user_index }}">Save changes</button>
-                          </div>
-                          {% endfor %}
-                          {% endfor %}
+                          
+                        {% endfor %}
+                      {% endfor %}   
                       </div>
+                      
+                      <!-- Modal footer -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="updateBtn-{{ sw.user_index }}" data-item-id="{{ sw.index_essay }}"
+                        data-user-id="{{ sw.user_index }}">Save changes</button>
+                    </div>
                   </div>
+              </div>
               </div>
               </td>
               
@@ -492,46 +492,70 @@
         }
         location.reload();
       });
-    });
+    }); 
 
     $(document).ready(function () {
-      $("#updateBtn").click(function () {
-        // Get additional data from the page
-        var itemId = $(this).data("item-id");
-        var userId = $(this).data("user-id");
-        var questionAnswers = [];
-        
-        $(".question_container").each(function () {
-          var questionId = $(this).find("#pertanyaan").data("item-id");
-          var answer = $(this).find("#jawaban").val();
+      $("[id^='updateBtn-']").click(function () {
+          // Get additional data from the page
+          var userIndex = this.id.replace("updateBtn-", "");
+          var itemId = $(this).data("item-id");
+  
+          // Initialize the questionAnswers array outside of the .each() loop
+          var questionAnswers = [];
+          
+          var elements = document.getElementsByClassName('question_container-'+userIndex);
 
-          // Add question-answer pair to the array
-          questionAnswers.push({
-              questionId: questionId,
-              answer: answer
+          
+          //const classCon = "[class^=question_container-" + userIndex + "]";
+          //var questionId = $(idModal).find("#pertanyaan").data("item-id");
+          //var answer = $(idModal).find("#jawaban").val();
+
+           // questionAnswers.push({
+             // questionId: questionId,
+              //answer: answer
+           // });
+
+          //console.log(questionId, answer, questionAnswers)
+  
+          $(elements).each(function () {
+            
+            console.log($(this))
+              var questionId = $(this).find("#pertanyaan").data("item-id");
+              var answer = $(this).find("#jawaban").val();
+  
+              // Add question-answer pair to the array
+              questionAnswers.push({
+                  questionId: questionId,
+                  answer: answer
+              });
+            
           });
-          console.log(itemId, userId);
-      });
 
-        // Submit the form using AJAX
-        $.ajax({
-          type: "POST",
-          url: "{{ url_for('users.update_answer', index=user['index'], index_soal="", user_index="") }}"+ itemId+'/' + userId, // Use the form action attribute
-          data: JSON.stringify({ questionAnswers: questionAnswers }),  // Corrected property name to 'data'
-          contentType: 'application/json;charset=UTF-8',  // Specify content type as JSON
-          success: function (response) {
-              // Handle success response
-              console.log(response);
-          },
-          error: function (error) {
-              // Handle error response
-              console.error(error);
-          },
+          console.log(userIndex, itemId)
+          console.log(questionAnswers)
+          
+          
+          // Submit the form using AJAX
+          $.ajax({
+              type: "POST",
+              url: "{{ url_for('users.update_answer', index=user['index'], index_soal='', user_index='') }}" + itemId + '/' + userIndex,
+              data: JSON.stringify({ questionAnswers: questionAnswers }),
+              contentType: 'application/json;charset=UTF-8',
+              success: function (response) {
+                  // Handle success response
+                  console.log(response);
+              },
+              error: function (error) {
+                  // Handle error response
+                  console.error(error);
+              },
+          });
+  
+          $("#staticBackdrop").modal("hide");
+          location.reload();
+          
       });
-        $("#staticBackdrop").modal("hide");
-        location.reload();
-      });
-    });
+  });    
   </script>
   <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
 </body>

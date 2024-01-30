@@ -104,9 +104,9 @@
                 onchange="checkDuplicate(this)"
               >
                 <option value="" selected disabled>Pilih Pertanyaan</option>
-                <option value="soal1">Soal 1</option>
-                <option value="soal2">Soal 2</option>
-                <option value="soal3">Soal 3</option>
+                {% for question in questions %}
+                  <option value="{{ question['question_text'] }}" data-question-id="{{ question['question_id'] }}">{{ question['question_text'] }}</option>
+                {% endfor %}
               </select>
             </div>
             <div
@@ -144,16 +144,43 @@
           Tambah lebih banyak +
         </button>
         <script>
+          var selectElement = document.getElementById("question");
+          var selectedValue = selectElement.value;
+          var questionId = selectedValue.getAttribute('data-question-id');
+          console.log(questionId)
+
           var selectedQuestions = [];
 
+          
           function checkDuplicate(selectElement) {
-            var selectedOption = selectElement.value;
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var questionText = selectedOption.value;
+            var questionId = selectedOption.getAttribute('data-question-id');
             
-            if (selectedQuestions.includes(selectedOption)) {
+            // Cek apakah opsi ini sudah dipilih sebelumnya
+            var isDuplicate = selectedQuestions.some(option => option.value === questionText);
+
+            if (isDuplicate) {
               alert("Soal ini sudah dipilih. Silakan pilih soal lain.");
-              selectElement.value = "";
+              selectElement.value = ""; // Reset nilai elemen select
             } else {
-              selectedQuestions.push(selectedOption);
+              // Simpan opsi yang baru dipilih
+              selectedQuestions.push({ value: questionText, id: questionId });
+            }
+            
+            // Menampilkan hasil di console (sesuaikan dengan kebutuhan Anda)
+            console.log("Selected Questions:", selectedQuestions);
+          }
+
+          function updateDropdownOptions() {
+            // Update the dropdown options by removing selected questions
+            var dropdown = document.getElementById("question");
+            var options = dropdown.options;
+          
+            for (var i = options.length - 1; i >= 0; i--) {
+              if (selectedQuestions.includes(options[i].value)) {
+                options[i].disabled = true;
+              }
             }
           }
           
@@ -169,6 +196,7 @@
               questionContainer.parentNode.removeChild(questionContainer);
             }
           }
+
           function addQuestion() {
             var questionContainer = document.getElementById(
               "question-container-main"
@@ -180,6 +208,7 @@
             newQuestionBox.style.width = "100%";
             newQuestionBox.style.marginBottom = "1rem";
 
+            /*
             var inputField = document.createElement("input");
             inputField.type = "text";
             inputField.className = "form-control ml-2";
@@ -187,32 +216,95 @@
             inputField.name = "questions[]"; // Use array notation for the input name
             inputField.style.width = "80%";
             inputField.style.display = "flex";
+            */
+      
+            var selectField = document.createElement("select");
+            selectField.className = "form-control ml-2";
+            selectField.placeHolder = "Pilih Pertanyaan";
+            selectField.name = "questions[]"; // Use array notation for the input name
+            selectField.style.width = "80%";
+            selectField.style.display = "flex";
 
-            var removeButtonContainer = document.createElement("div");
-            removeButtonContainer.style.width = "20%";
-            removeButtonContainer.style.display = "flex";
-            removeButtonContainer.style.alignItems = "center";
-            removeButtonContainer.style.justifyContent = "flex-end";
+            var defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.text = "Pilih Pertanyaan";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            selectField.appendChild(defaultOption);
 
-            var removeButton = document.createElement("button");
-            removeButton.type = "button";
-            removeButton.className = "btn";
-            removeButton.style.backgroundColor = "red";
-            removeButton.style.height = "100%";
-            removeButton.style.color = "white";
-            removeButton.textContent = "Remove";
+            async function fetchData() {
+              try {
+                const response = await fetch('/api/questions');
+            
+                if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            
+                const data = await response.json();
+                return data;
+              } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+              }
+            }
+            
+            // Inisialisasi variabel questionOptions
+            
+            // Panggil fungsi fetchData dan tangkap hasilnya menggunakan then
+            fetchData().then(data => {
+              var question = data.questions; // Ambil hanya bagian questions dari data
+              console.log('Data from API:', question);
 
-            removeButton.addEventListener("click", function () {
-              // Remove the question box when the remove button is clicked
-              questionContainer.removeChild(newQuestionBox);
+              /*
+              var questionOptions = question.filter(q => q.question_text).map(q => q.question_text);
+              console.log('Question Options:', questionOptions);
+              var questionId = question.filter(q => q.question_id).map(q => q.question_id);
+              console.log('Question Id:', questionId);
+              */
+
+              // Lakukan operasi lainnya di sini, contohnya
+              for (var i = 0; i < question.length; i++) {
+                if (question[i]._id === "ques_id") {
+                  // Jika sama, skip ke iterasi berikutnya
+                  continue;
+                }
+                
+                var option = document.createElement("option");
+                option.value = question[i].question_text;
+                option.text = question[i].question_text;
+
+                // Sertakan question_id sebagai atribut data
+                option.setAttribute('data-question-id', question[i].question_id);
+
+                selectField.appendChild(option);
+              }
+  
+              var removeButtonContainer = document.createElement("div");
+              removeButtonContainer.style.width = "20%";
+              removeButtonContainer.style.display = "flex";
+              removeButtonContainer.style.alignItems = "center";
+              removeButtonContainer.style.justifyContent = "flex-end";
+  
+              var removeButton = document.createElement("button");
+              removeButton.type = "button";
+              removeButton.className = "btn";
+              removeButton.style.backgroundColor = "red";
+              removeButton.style.height = "100%";
+              removeButton.style.color = "white";
+              removeButton.textContent = "Remove";
+  
+              removeButton.addEventListener("click", function () {
+                // Remove the question box when the remove button is clicked
+                questionContainer.removeChild(newQuestionBox);
+              });
+  
+              newQuestionBox.appendChild(selectField);
+              removeButtonContainer.appendChild(removeButton);
+              newQuestionBox.appendChild(removeButtonContainer);
+  
+              // Append the new question box to the container
+              questionContainer.appendChild(newQuestionBox);
+              updateDropdownOptions();
             });
-
-            newQuestionBox.appendChild(inputField);
-            removeButtonContainer.appendChild(removeButton);
-            newQuestionBox.appendChild(removeButtonContainer);
-
-            // Append the new question box to the container
-            questionContainer.appendChild(newQuestionBox);
           }
 
           function removeQuestion(button) {

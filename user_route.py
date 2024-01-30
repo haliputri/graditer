@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify, Blueprint, redirect, url_for, render_template, flash
-from config import mongo, db_user, db_essay, db_sw
+from flask import request, jsonify, Blueprint, redirect, url_for, render_template, flash
+from config import db_user, db_essay, db_sw, db_question
 from model_aes import preprocess, f1
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -124,6 +124,19 @@ def api_users():
     # Return a JSON response containing the inserted users
     return jsonify(response_data)
 
+@user_blueprint.route('/api/questions', methods=['GET'])
+def get_questions():
+    questions_cursor = db_question.find()
+    questions = list(questions_cursor)
+    for question in questions:
+        question['_id'] = str(question['_id'])
+        
+    try:
+        response_data = {'questions': questions}
+        return jsonify(response_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @user_blueprint.route('/delete/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
     db_user.delete_one({'_id': ObjectId(user_id)})
@@ -170,30 +183,22 @@ def update_user(user_id):
 def tambahEsai(index):
     try:
         user = db_user.find_one({'index': index})
+        exception_question_id = 'ques_id'
+        questions_cursor = db_question.find({'_id': {'$ne': exception_question_id}})
+        # Convert Cursor to list and ObjectId to string
+        questions = list(questions_cursor)
         
+        for question in questions:
+            question['_id'] = str(question['_id'])
+            
         if user:
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-            return render_template('admin/tambahEsai.html', user=user, user_name=user_name)
+            return render_template('admin/tambahEsai.html', user=user, user_name=user_name, questions=questions)
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
-    
-# @user_blueprint.route('/users/<user_id>')
-# def get_user_by_id(user_id):
-#     try:
-#         user_object_id = ObjectId(user_id)
-#         user = db_user.find_one({'_id': user_object_id})
-
-#         if user:
-#             user['_id'] = str(user['_id'])
-#             return jsonify(user)
-#         else:
-#             return jsonify({'error' : 'User not found'}), 404
-#     except Exception as e:
-#         # Handle any exceptions that may occur during the process
-#         return jsonify({'error': str(e)}), 500
     
 @user_blueprint.route('/users/<index>')
 def get_user_by_index(index):
@@ -543,8 +548,10 @@ def result(index, index_soal):
 @user_blueprint.route('/admin/adminEsai/<index>', methods=['GET', 'POST'])
 def create_essays(index):
     exception_essay_id = 'essay_id'
+    exception_question_id = 'ques_id'
     essays_data = db_essay.find({'_id': {'$ne': exception_essay_id}})
     user = db_user.find_one({'index': index})
+    questions = db_question.find({'_id': {'$ne': exception_question_id}})
     
     # Accessing form data
     if user and essays_data and request.method == 'POST' :
@@ -554,23 +561,36 @@ def create_essays(index):
         title = str(request.form.get('title'))
         total_time = request.form.get('total-time')
         form_file = request.files['formFile']
-        questions_texts = request.form.getlist('questions[]')
-        question_id = 1  # Initialize question_id to 1
+        # questions_texts = request.form.getlist('questions[]')
+        # question_id = 1  # Initialize question_id to 1
+        
+        questions_selected = request.form.getlist('questions[]')
+        question_id_mapping = {question['question_text']: question['question_id'] for question in questions}
+        selected_question_ids = [question_id_mapping[question_text] for question_text in questions_selected]
+        
         processed_questions = []
         _index = str(essay_inc_index())
         _max=int(request.form.get('max_length'))
             
-        for question_text in questions_texts:
-            # Incremental processing logic based on question_id and question_text
+        # for question_text in questions_texts:
+        #     # Incremental processing logic based on question_id and question_text
+        #     processed_question = {
+        #         'question_id': question_id,
+        #         'question_text': question_text
+        #         # Add more fields as needed
+        #     }
+        #     processed_questions.append(processed_question)
+
+        #     # Increment question_id
+        #     question_id += 1
+        
+        for question_text, question_id in zip(questions_selected, selected_question_ids):
             processed_question = {
                 'question_id': question_id,
-                'question_text': question_text
+                'question_text': question_text,
                 # Add more fields as needed
             }
             processed_questions.append(processed_question)
-
-            # Increment question_id
-            question_id += 1
         
         try:
             filename = secure_filename(form_file.filename)
@@ -587,7 +607,7 @@ def create_essays(index):
                 'max_length':_max
             }
 
-            if mata_pelajaran and title and total_time and questions_texts and max:
+            if mata_pelajaran and title and total_time and max:
                 db_essay.insert_one(essay_data)
                 essays = list(essays_data)
                 return render_template('admin/adminEsai.html', essays=essays, user=user, user_name=user_name)
@@ -857,10 +877,18 @@ def update_answer(index, index_soal, user_index):
         essay = db_essay.find_one({'index': index_soal})
         user_sw = db_sw.find_one({'user_index': user_index})
         
-        # for qa in question_answers:
-        #     question_id = qa.get('questionId')
-        #     answer = qa.get('answer')
-        #     print(question_id,answer)
+        detail_questions = []
+        
+        for question in question_answers:
+            question_id = question.get('questionId')
+            # print(question_id)
+            detail_question = db_question.find_one({'question_id': str(question_id)})
+            question_answer = question.get('answer')
+            detail_question['answer'] = str(question_answer)
+            # print(detail_question)
+            detail_questions.append(detail_question)
+            
+        # print(detail_questions)
         
         max_length = essay['max_length']
         model_file_id = ObjectId(essay['model_file_id'])
@@ -880,9 +908,9 @@ def update_answer(index, index_soal, user_index):
         if user and request.method == 'POST':
             answer_data_list = []
 
-            for qa in question_answers:
-                question_id = qa.get('questionId')
-                answer = qa.get('answer')
+            for qa in detail_questions:
+                question_id = qa['question_id']
+                answer = qa['answer']
                 print(question_id,answer)
 
                 processed_answer = preprocess(answer)

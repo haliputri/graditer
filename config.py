@@ -13,6 +13,7 @@ fs = GridFS(mongo.db)
 db_user = mongo.db.users
 db_essay = mongo.db.essays
 db_sw = mongo.db.student_works
+db_question = mongo.db.question_alls
 
 def check_mongo_connection():
     try:
