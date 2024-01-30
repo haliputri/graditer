@@ -11,8 +11,8 @@ head %}<link
       <ul class="pagination">
         {% for q in questions %}
         <li class="page-item">
-          <a class="page-link" href="#{{ q.question_id }}"
-            >{{ q.question_id }}</a
+          <a class="page-link" href="#{{ loop.index }}"
+            >{{ loop.index }}</a
           >
         </li>
         {% endfor %}
@@ -32,7 +32,7 @@ head %}<link
           <label for="soal" name="soal"  data-soal="{{ q.question_id }}"
             ><b
               >Soal
-              <span>{{ q.question_id }}</span>
+              <span>{{ loop.index }}</span>
             </b></label
           ><br />
           <input

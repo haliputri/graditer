@@ -10,7 +10,6 @@ from bson import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from config import fs
-from bson.binary import Binary
 from io import BytesIO
 
 user_blueprint = Blueprint('users', __name__)
@@ -272,21 +271,6 @@ def login():
             flash('Invalid email or password', 'error')
             
     return render_template('login.html')
-
-# @user_blueprint.route('/user/<user_id>')
-# def profile_user_by_id(user_id):
-#     try:
-#         user_object_id = ObjectId(user_id)
-#         user = db_user.find_one({'_id': user_object_id})
-
-#         if user:
-#             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-#             return render_template('user.html', user_id=str(user['_id']), user_email=user['email'], user_name=user_name)
-#         else:
-#             return jsonify({'error' : 'User not found'}), 404
-#     except Exception as e:
-#         # Handle any exceptions that may occur during the process
-#         return jsonify({'error': str(e)}), 500
     
 @user_blueprint.route('/user/<index>')
 def profile_user_by_index(index):
@@ -340,21 +324,6 @@ def profile_user_by_index(index):
     except Exception as e:
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
-    
-# @user_blueprint.route('/admin/<user_id>')
-# def profile_admin_by_id(user_id):
-#     try:
-#         user_object_id = ObjectId(user_id)
-#         user = db_user.find_one({'_id': user_object_id})
-
-#         if user:
-#             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-#             return render_template('/admin/admin.html', user_id=str(user['_id']), user_email=user['email'], user_name=user_name)
-#         else:
-#             return jsonify({'error' : 'Admin not found'}), 404
-#     except Exception as e:
-#         # Handle any exceptions that may occur during the process
-#         return jsonify({'error': str(e)}), 500
 
 @user_blueprint.route('/admin/<index>')
 def profile_admin_by_index(index):
@@ -369,22 +338,6 @@ def profile_admin_by_index(index):
     except Exception as e:
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
-    
-# @user_blueprint.route('/user/intro/<user_id>')
-# def introSoal(user_id):
-#     try:
-#         user_object_id = ObjectId(user_id)
-#         user = db_user.find_one({'_id': user_object_id})
-
-#         if user:
-#             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-#             return render_template('introSoal.html', user_id=str(user['_id']), user_email=user['email'], user_name=user_name)
-#         else:
-#             return jsonify({'error' : 'Page not found'}), 404
-#     except Exception as e:
-#         # Handle any exceptions that may occur during the process
-#         return jsonify({'error': str(e)}), 500
-    
 
 @user_blueprint.route('/user/intro/<index>/<index_soal>')
 def introSoal(index, index_soal):
@@ -451,9 +404,6 @@ def kerjakanSoal(index, index_soal):
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
 
-
-
-
 @user_blueprint.route('/user/hasil/<index>/<index_soal>', methods=['GET', 'POST'])
 def result(index, index_soal):
     try:
@@ -478,15 +428,15 @@ def result(index, index_soal):
             global model
             model = load_model(temp_model_file_path)
         
-        num = 1
+        # num = 1
         
         if user and request.method == 'POST':
             answer_data_list = []
 
             for q in questions:
-                question_id = num
+                question_id = q['question_id']
                 answer = request.form.get(f'answer_{q["question_id"]}')
-                num += 1
+                # num += 1
 
                 processed_answer = preprocess(answer)
                 maxlen = max_length
@@ -571,18 +521,6 @@ def create_essays(index):
         processed_questions = []
         _index = str(essay_inc_index())
         _max=int(request.form.get('max_length'))
-            
-        # for question_text in questions_texts:
-        #     # Incremental processing logic based on question_id and question_text
-        #     processed_question = {
-        #         'question_id': question_id,
-        #         'question_text': question_text
-        #         # Add more fields as needed
-        #     }
-        #     processed_questions.append(processed_question)
-
-        #     # Increment question_id
-        #     question_id += 1
         
         for question_text, question_id in zip(questions_selected, selected_question_ids):
             processed_question = {
@@ -644,49 +582,7 @@ def detail_esai(index, index_soal):
             'user_index': {'$in': registered_user_indexes}
         })
         
-        # temp_cursor = db_sw.find({
-        #     'index_essay': index_soal,
-        #     'user_index': {'$in': registered_user_indexes}
-        # })
-        # temp_data = list(temp_cursor)
-        
-        # list_answer_data = []
-        # for t in temp_data:
-        #     result = t.get('answer_data', [])
-        #     list_answer_data.append(result)
-            
-        # for l in list_answer_data
-            
-        # first_temp = temp_data[0]
-
-        # # Retrieve 'answer_data' from the first element
-        # result = first_temp.get('answer_data', [])
-
-        # # Retrieve 'predicted_score' from 'answer_data'
-        # predicted_scores = [item.get('predicted_score', 0) for item in result]
-
-        # # Convert predicted_scores to tens using the convert_to_tens function
-        # result_in_tens = convert_to_tens(predicted_scores)
-        # print(registered_user_indexes)
-        
         users_not_in_sw = db_user.find({'index': {'$nin': registered_user_indexes}, '_id': {'$ne': exception_user_id}})
-        
-        # for doc in user_essay_do:
-        #     index_essay = doc['index_essay']
-        #     answer_data = doc.get('answer_data', [])
-        #     for entry in answer_data:
-        #         predicted_score = entry.get('predicted_score')
-        #         if predicted_score is None and index_essay not in index_essay_none:
-        #             index_essay_none.append(index_essay)
-        #         else:
-        #             index_essay_and_predicted_score.append({'index_essay': index_essay, 'predicted_score': predicted_score})
-        
-        # answer_data = [student['answer_data'] for student in student_work]
-        # print(answer_data)
-        # for doc in student_work:
-        #     answer_data.append(doc.get('answer_data', []))
-        # for user in users_not_in_sw:
-        #     print(user['index'])
 
         if user and users_not_in_sw:
             # essay_json = json_util.dumps(essay)
@@ -710,11 +606,6 @@ def edit_esai(index, index_soal):
         user = db_user.find_one({'index': index, '_id': {'$ne': exception_user_id}})
         essay = db_essay.find_one({'index': index_soal, '_id': {'$ne': exception_essay}} )
         model_file_id = ObjectId(essay['model_file_id'])
-        # if essay and essay['model_file_id']:
-        #     model_file_id = ObjectId(essay['model_file_id'])
-        # else:
-        #     # Handle the case where essay or essay['model_file_id'] is None
-        #     model_file_id = None  # Or assign a default value or handle the case accordingly
         
         model = fs.get(model_file_id)
         model_name = model.filename  
@@ -780,18 +671,6 @@ def delete_essay(index, index_soal):
     try:
         # exception_essay_id = 'essay_id'
         user = db_user.find_one({'index': index})
-        # essays = db_essay.find_one({'index': index_soal, '_id': {'$ne': exception_essay_id}})
-        # model_file_id = ObjectId(essay['model_file_id'])
-        # model = fs.get(model_file_id)
-        # model_name = model.filename
-        # users = db_user.find()
-        
-        # questions = essay.get('questions', [])
-        # question_texts = [question.get('question_text', '') for question in questions]
-        
-        # registered_students = db_sw.find({'index_essay': index_soal})
-        # Filter the users to exclude those who are already registered
-        # available_students = [user for user in users if user['index'] not in [student['user_index'] for student in registered_students]]
         
         if user and request.method == 'DELETE':
             index_soal = request.view_args.get('index_soal')
