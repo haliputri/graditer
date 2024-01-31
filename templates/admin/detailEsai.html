@@ -334,20 +334,20 @@
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
           
-                      <!-- Modal body -->
-                      <div class="modal-body">
+                        <!-- Modal body -->
+                        <div class="modal-body">
                            {% for qt in questions %}
-                        {% for ad in sw.answer_data %}
-                        {% if qt.question_id == ad.question_id %}
-                                <div class="mb-2 question_container-{{ sw.user_index }}">
-                                  <p class="mb-0" id="pertanyaan" data-item-id="{{ qt.question_id }}" >{{ qt.question_text }}</p>
-                                  <textarea type="text" class="form-control" id="jawaban" data-answer-id="{{ ad.answer }}" style="height:100px">{{ ad.answer }}</textarea>
-                                </div>
-                                {% endif %} 
-                          
-                        {% endfor %}
-                      {% endfor %}   
-                      </div>
+                              {% for ad in sw.answer_data %}
+                              {% if qt.question_id == ad.question_id %}
+                                      <div class="mb-2 question_container-{{ sw.user_index }}">
+                                        <p class="mb-0" id="pertanyaan" data-item-id="{{ qt.question_id }}" >{{ qt.question_text }}</p>
+                                        <textarea type="text" class="form-control" id="jawaban" data-answer-id="{{ ad.answer }}" style="height:100px">{{ ad.answer }}</textarea>
+                                      </div>
+                                      {% endif %} 
+                                
+                            {% endfor %}
+                          {% endfor %}   
+                        </div>
                       
                       <!-- Modal footer -->
                       <div class="modal-footer">

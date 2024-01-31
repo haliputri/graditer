@@ -14,6 +14,7 @@ app.register_blueprint(essay_blueprint)
 get_model()
 check_mongo_connection()
 
+
 # @app.route("/", methods=['GET', 'POST'])
 # def hello_world():
 #     request_type_str = request.method

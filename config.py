@@ -27,4 +27,11 @@ def check_mongo_connection():
         # print(mongo.cx)
     except Exception as e:
         print(f'MongoDB connection error: {e}')
+        
 
+# import pandas as pd
+
+# Baca data dari CSV ke dalam DataFrame
+# df = pd.read_csv('SOAL_13_100.csv')
+# data_stimulus = df['RESPONSE'].tolist()
+# print(data_stimulus[0:3])

@@ -1,6 +1,5 @@
 from flask import request, jsonify, Blueprint, redirect, url_for, render_template, flash
 from config import db_user, db_essay, db_sw, db_question
-from model_aes import preprocess, f1
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras import backend as K
@@ -10,7 +9,9 @@ from bson import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from config import fs
-from io import BytesIO
+from model_aes import preprocess, f1
+from io import BytesIO, StringIO
+import pandas as pd
 
 user_blueprint = Blueprint('users', __name__)
 
@@ -32,6 +33,46 @@ def essay_inc_index():
         return_document=True,
     )
     return str(essay["dump_index"])
+
+def import_csv_to_mongo(csv_content, collection_name):
+    # Convert CSV content to DataFrame
+    df = pd.read_csv(StringIO(csv_content))
+    # Convert DataFrame to dictionary records
+    data_json = df.to_dict(orient='records')
+
+    # Insert records into MongoDB collection
+    db_question.insert_many(data_json)
+
+@user_blueprint.route('/upload_question', methods=['POST'])
+def upload_question():
+    # Get JSON data from request
+    data = request.json
+
+    # Extract relevant fields
+    question_id = data['question_id']
+    question_text = data['question_text']
+    mata_pelajaran = data['mata_pelajaran']
+    get_file = data['id_csv']
+    # Read CSV file directly
+    file_content = pd.read_csv(get_file)
+
+    # Save CSV file to GridFS
+    filename = get_file  # You can customize the filename
+    file_id = fs.put(file_content.to_csv(index=False).encode('utf-8'), filename=filename)
+
+    # Import CSV data into MongoDB collection
+    # import_csv_to_mongo(file_content.to_csv(index=False), 'questions_collection')
+
+    # Store question details in another collection (assuming a 'questions' collection)
+    db_question.insert_one({
+        'question_id': question_id,
+        'question_text': question_text,
+        'mata_pelajaran': mata_pelajaran,
+        'id_csv': str(file_id)
+    })
+
+    return jsonify({'message': 'Question uploaded successfully!'})
+
 
 def convert_to_tens(predicted_scores):
     # predicted_scores: list atau array dari nilai predicted_score
@@ -127,8 +168,16 @@ def api_users():
 def get_questions():
     questions_cursor = db_question.find()
     questions = list(questions_cursor)
+    print(questions)
+    
     for question in questions:
         question['_id'] = str(question['_id'])
+        try:
+        # Try to extract 'csv_file_id' and convert it to its string representation
+            question['id_csv'] = str(question['id_csv'])
+        except KeyError:
+            # Handle the case where 'csv_file_id' doesn't exist in the document
+            pass
         
     try:
         response_data = {'questions': questions}
@@ -437,12 +486,19 @@ def result(index, index_soal):
                 question_id = q['question_id']
                 answer = request.form.get(f'answer_{q["question_id"]}')
                 # num += 1
+                file_id_to_retrieve = ObjectId(q['csv_file_id'])
+                file_content = fs.get_last_version(file_id_to_retrieve).read().decode('utf-8')
+
+                # Convert CSV content to DataFrame
+                df = pd.read_csv(StringIO(file_content))
+                data_stimulus = df['RESPONSE'].tolist()
+                print(data_stimulus[0:3])
 
                 processed_answer = preprocess(answer)
                 maxlen = max_length
 
                 tokenizer = Tokenizer()
-                token_1 = tokenizer.fit_on_texts([processed_answer])
+                tokenizer.fit_on_texts(data_stimulus)
                 essay_tokens_1 = tokenizer.texts_to_sequences([processed_answer])
 
                 essay_tokens_padded_1 = pad_sequences(essay_tokens_1, maxlen=maxlen)
@@ -519,6 +575,7 @@ def create_essays(index):
         selected_question_ids = [question_id_mapping[question_text] for question_text in questions_selected]
         
         processed_questions = []
+        
         _index = str(essay_inc_index())
         _max=int(request.form.get('max_length'))
         
@@ -764,10 +821,11 @@ def update_answer(index, index_soal, user_index):
             detail_question = db_question.find_one({'question_id': str(question_id)})
             question_answer = question.get('answer')
             detail_question['answer'] = str(question_answer)
+            # detail_question['id_csv'] = question.get('id_csv')
             # print(detail_question)
             detail_questions.append(detail_question)
             
-        # print(detail_questions)
+        print(detail_questions)
         
         max_length = essay['max_length']
         model_file_id = ObjectId(essay['model_file_id'])
@@ -784,22 +842,34 @@ def update_answer(index, index_soal, user_index):
             global model
             model = load_model(temp_model_file_path)
         
+        
         if user and request.method == 'POST':
             answer_data_list = []
 
             for qa in detail_questions:
                 question_id = qa['question_id']
                 answer = qa['answer']
-                print(question_id,answer)
+                file_id_to_retrieve = ObjectId(qa['id_csv'])
+                print(file_id_to_retrieve)
+                # file_content = fs.get_last_version(file_id_to_retrieve).read().decode('utf-8')
+                file_content = fs.get(file_id_to_retrieve)
+                
+
+                # Convert CSV content to DataFrame
+                df = pd.read_csv(file_content)
+                data_stimulus = df['RESPONSE'].tolist()
+                # print(data_stimulus[0:3])
+                # print(question_id,answer)
+                
 
                 processed_answer = preprocess(answer)
                 maxlen = max_length
-
+                
                 tokenizer = Tokenizer()
-                token_1 = tokenizer.fit_on_texts([processed_answer])
+                tokenizer.fit_on_texts(data_stimulus)
                 essay_tokens_1 = tokenizer.texts_to_sequences([processed_answer])
-
                 essay_tokens_padded_1 = pad_sequences(essay_tokens_1, maxlen=maxlen)
+                print(essay_tokens_padded_1)
 
                 result_as_str = str(model.predict(essay_tokens_padded_1))
 
@@ -810,7 +880,8 @@ def update_answer(index, index_soal, user_index):
                 }
                 answer_data_list.append(answer_data)
             
-            print(answer_data_list)
+            # print(answer_data_list)
+            
             student_work = {
                 'answer_data': answer_data_list
             }
