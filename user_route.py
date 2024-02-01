@@ -458,10 +458,25 @@ def result(index, index_soal):
     try:
         user = db_user.find_one({'index': index})
         essay = db_essay.find_one({'index':index_soal})
-        questions = essay.get('questions', [])
+        question_answers = essay.get('questions', [])
         user_essay_done = db_sw.find({'user_index' : index})
         essay_done = [entry.get('index_essay') for entry in user_essay_done]
         # Assuming model is stored in GridFS and retrieved as 'model' from fs.get(model_file_id)
+        detail_questions = []
+        # print(essay_done)
+        
+        for question in question_answers:
+            question_id = question['question_id']
+            # print(question_id)
+            detail_question = db_question.find_one({'question_id': str(question_id)})
+            question_answer = request.form.get(f'answer_{question["question_id"]}')
+            detail_question['answer'] = str(question_answer)
+            # detail_question['id_csv'] = question.get('id_csv')
+            # print(detail_question)
+            detail_questions.append(detail_question)
+            
+        print(detail_questions)
+        
         max_length = essay['max_length']
         model_file_id = ObjectId(essay['model_file_id'])
         model_data = fs.get(model_file_id)
@@ -482,17 +497,20 @@ def result(index, index_soal):
         if user and request.method == 'POST':
             answer_data_list = []
 
-            for q in questions:
-                question_id = q['question_id']
-                answer = request.form.get(f'answer_{q["question_id"]}')
-                # num += 1
-                file_id_to_retrieve = ObjectId(q['csv_file_id'])
-                file_content = fs.get_last_version(file_id_to_retrieve).read().decode('utf-8')
+            for qa in detail_questions:
+                question_id = qa['question_id']
+                answer = qa['answer']
+                file_id_to_retrieve = ObjectId(qa['id_csv'])
+                print(file_id_to_retrieve)
+                # file_content = fs.get_last_version(file_id_to_retrieve).read().decode('utf-8')
+                file_content = fs.get(file_id_to_retrieve)
+                
 
                 # Convert CSV content to DataFrame
-                df = pd.read_csv(StringIO(file_content))
+                df = pd.read_csv(file_content)
                 data_stimulus = df['RESPONSE'].tolist()
-                print(data_stimulus[0:3])
+                # print(data_stimulus[0:3])
+                # print(question_id,answer)
 
                 processed_answer = preprocess(answer)
                 maxlen = max_length
@@ -500,8 +518,8 @@ def result(index, index_soal):
                 tokenizer = Tokenizer()
                 tokenizer.fit_on_texts(data_stimulus)
                 essay_tokens_1 = tokenizer.texts_to_sequences([processed_answer])
-
                 essay_tokens_padded_1 = pad_sequences(essay_tokens_1, maxlen=maxlen)
+                print(essay_tokens_padded_1)
 
                 result_as_str = str(model.predict(essay_tokens_padded_1))
 
@@ -510,7 +528,6 @@ def result(index, index_soal):
                     'answer': answer,
                     'predicted_score': result_as_str
                 }
-
                 answer_data_list.append(answer_data)
 
             
