@@ -54,7 +54,7 @@ def upload_question():
     mata_pelajaran = data['mata_pelajaran']
     get_file = data['id_csv']
     # Read CSV file directly
-    file_content = pd.read_csv(get_file)
+    file_content = pd.read_csv('data/' + get_file)
 
     # Save CSV file to GridFS
     filename = get_file  # You can customize the filename

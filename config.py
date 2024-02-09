@@ -4,7 +4,8 @@ from gridfs import GridFS
 import secrets
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.config['MONGO_URI'] = 'mongodb+srv://haliputri:1sampai8@cluster0.kkhummw.mongodb.net/aes'
+# app.config['MONGO_URI'] = 'mongodb+srv://haliputri:1sampai8@cluster0.kkhummw.mongodb.net/aes'
+app.config['MONGO_URI'] = 'mongodb+srv://haliputri:1sampai8@graditer.smz5cee.mongodb.net/graditer'
 app.secret_key = secrets.token_hex(24)
 mongo = PyMongo(app)
 mongo.init_app(app)
