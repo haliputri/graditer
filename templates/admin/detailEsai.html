@@ -534,7 +534,9 @@
           console.log(userIndex, itemId)
           console.log(questionAnswers)
           
-          
+          url = "{{ url_for('users.update_answer', index="", index_soal='', user_index='') }}" + 2 + itemId + '/' + userIndex,
+          console.log(url)
+
           // Submit the form using AJAX
           $.ajax({
               type: "POST",
