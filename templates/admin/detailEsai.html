@@ -451,8 +451,10 @@
 
         if (confirm("Are you sure you want to delete this user?")) {
           $.ajax({
-            url: "{{ url_for('users.delete_sw', index=user['index'], essay_index="", user_index="") }}"+itemId+ "/" + userId,
             type: "DELETE",
+            url: "{{ url_for('users.delete_sw', index=user['index']) }}",
+            data: JSON.stringify({ essay_index : itemId, user_index : userId}),
+            contentType: 'application/json;charset=UTF-8',
             success: function (response) {
               // Handle success (e.g., remove the deleted item from the UI)
               console.log(response);
@@ -476,8 +478,10 @@
     
         if (confirm("Are you sure you want to restart this user?")) {
           $.ajax({
-            url: "{{ url_for('users.ulang_esai', index=user['index'], essay_index="", user_index="") }}"+ itemId+'/' + userId,
             type: "POST",
+            url: "{{ url_for('users.ulang_esai', index=user['index']) }}",
+            data: JSON.stringify({ essay_index : itemId, user_index : userId}),
+            contentType: 'application/json;charset=UTF-8',
             success: function (response) {
               // Handle success (e.g., remove the deleted item from the UI)
               console.log(response);
@@ -534,14 +538,19 @@
           console.log(userIndex, itemId)
           console.log(questionAnswers)
           
-          url = "{{ url_for('users.update_answer', index="", index_soal='', user_index='') }}" + 2 + itemId + '/' + userIndex,
-          console.log(url)
-
+          //var url  = "{{ url_for('users.update_answer', index="user.index", index_soal="itemId", user_index="userIndex") }}"
+          //url = url.replace("index_soal=", "index_soal=" + itemId);
+          //url = url.replace("user_index=", "user_index=" + userIndex);
+          //console.log(url)
+          //console.log(apa)
           // Submit the form using AJAX
+          
           $.ajax({
               type: "POST",
-              url: "{{ url_for('users.update_answer', index=user['index'], index_soal='', user_index='') }}" + itemId + '/' + userIndex,
-              data: JSON.stringify({ questionAnswers: questionAnswers }),
+              url :"{{ url_for('users.update_answer', index=user['index']) }}",
+              data: JSON.stringify({ questionAnswers: questionAnswers,
+              index_soal : itemId,
+              user_index : userIndex }),
               contentType: 'application/json;charset=UTF-8',
               success: function (response) {
                   // Handle success response
@@ -554,8 +563,7 @@
           });
   
           $("#staticBackdrop").modal("hide");
-          location.reload();
-          
+          location.reload();   
       });
   });    
   </script>

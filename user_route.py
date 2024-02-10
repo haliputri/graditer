@@ -821,10 +821,114 @@ def student_work_topic(index, index_soal):
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
 
-@user_blueprint.route('/admin/update/<index>/<index_soal>/<user_index>', methods=['POST'])
-def update_answer(index, index_soal, user_index):
+# @user_blueprint.route('/admin/update/<index>/<index_soal>/<user_index>', methods=['POST'])
+# def update_answer(index, index_soal, user_index):
+#     try:
+#         data = request.json
+#         question_answers = data.get('questionAnswers', [])
+#         user = db_user.find_one({'index': index})
+#         essay = db_essay.find_one({'index': index_soal})
+#         user_sw = db_sw.find_one({'user_index': user_index})
+        
+#         detail_questions = []
+        
+#         for question in question_answers:
+#             question_id = question.get('questionId')
+#             # print(question_id)
+#             detail_question = db_question.find_one({'question_id': str(question_id)})
+#             question_answer = question.get('answer')
+#             detail_question['answer'] = str(question_answer)
+#             # detail_question['id_csv'] = question.get('id_csv')
+#             # print(detail_question)
+#             detail_questions.append(detail_question)
+            
+#         print(detail_questions)
+        
+#         max_length = essay['max_length']
+#         model_file_id = ObjectId(essay['model_file_id'])
+#         model_data = fs.get(model_file_id)
+#         model_bytesio = BytesIO(model_data.read())
+
+#         # Save the in-memory file to a temporary file
+#         temp_model_file_path = "temp_model.h5"
+#         with open(temp_model_file_path, "wb") as temp_file:
+#             temp_file.write(model_bytesio.read())
+
+#         # Load the model with custom metric
+#         with keras.utils.custom_object_scope({'f1': f1}):
+#             global model
+#             model = load_model(temp_model_file_path)
+        
+        
+#         if user and request.method == 'POST':
+#             answer_data_list = []
+
+#             for qa in detail_questions:
+#                 question_id = qa['question_id']
+#                 answer = qa['answer']
+#                 file_id_to_retrieve = ObjectId(qa['id_csv'])
+#                 print(file_id_to_retrieve)
+#                 # file_content = fs.get_last_version(file_id_to_retrieve).read().decode('utf-8')
+#                 file_content = fs.get(file_id_to_retrieve)
+                
+
+#                 # Convert CSV content to DataFrame
+#                 df = pd.read_csv(file_content)
+#                 data_stimulus = df['RESPONSE'].tolist()
+#                 # print(data_stimulus[0:3])
+#                 # print(question_id,answer)
+                
+
+#                 processed_answer = preprocess(answer)
+#                 maxlen = max_length
+                
+#                 tokenizer = Tokenizer()
+#                 tokenizer.fit_on_texts(data_stimulus)
+#                 essay_tokens_1 = tokenizer.texts_to_sequences([processed_answer])
+#                 essay_tokens_padded_1 = pad_sequences(essay_tokens_1, maxlen=maxlen)
+#                 print(essay_tokens_padded_1)
+
+#                 result_as_str = str(model.predict(essay_tokens_padded_1))
+
+#                 answer_data = {
+#                     'question_id': question_id,
+#                     'answer': answer,
+#                     'predicted_score': result_as_str
+#                 }
+#                 answer_data_list.append(answer_data)
+            
+#             # print(answer_data_list)
+            
+#             student_work = {
+#                 'answer_data': answer_data_list
+#             }
+
+#             # Insert the entire student work data into the database
+#             db_sw.update_one({'user_index':user_index, 'index_essay':index_soal}, {'$set': student_work})
+#             temp = db_sw.find_one({'user_index': user_index, 'index_essay': index_soal})
+#             result = temp.get('answer_data', [])
+#             predicted_scores = [item.get('predicted_score', 0) for item in result]
+#             result_in_tens = convert_to_tens(predicted_scores)
+            
+#             db_sw.update_one(
+#                 {'user_index': user_index, 'index_essay': index_soal},
+#                 {'$set': {'result_in_tens': result_in_tens}}
+#             )
+#             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0] 
+#             return redirect(url_for('users.adminEsai', index=user['index'], user_name=user_name)) 
+#         else:
+#             return jsonify({'error' : 'Page not found'}), 404
+#     except Exception as e:
+#         # Handle any exceptions that may occur during the process
+#         return jsonify({'error': str(e)}), 500
+        
+@user_blueprint.route('/admin/update_answer/<index>', methods=['POST'])
+def update_answer(index):
     try:
         data = request.json
+        index_soal = str(data.get('index_soal'))
+        user_index = str(data.get('user_index'))
+        print(index_soal, user_index)
         question_answers = data.get('questionAnswers', [])
         user = db_user.find_one({'index': index})
         essay = db_essay.find_one({'index': index_soal})
@@ -915,17 +1019,48 @@ def update_answer(index, index_soal, user_index):
                 {'$set': {'result_in_tens': result_in_tens}}
             )
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0] 
-            return redirect(url_for('users.adminEsai', index=user['index'], user_name=user_name)) 
+            return redirect(url_for('users.detail_esai', index=user['index'], user_name=user_name)) 
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
-        
     
-@user_blueprint.route('/admin/detail/<index>/<essay_index>/<user_index>', methods=['DELETE'])
-def delete_sw(index, essay_index, user_index):
+# @user_blueprint.route('/admin/detail/<index>/<essay_index>/<user_index>', methods=['DELETE'])
+# def delete_sw(index, essay_index, user_index):
+#     try:
+#         user = db_user.find_one({'index': index})
+#         essay = db_essay.find_one({'index': essay_index})
+#         model_file_id = ObjectId(essay['model_file_id'])
+#         model = fs.get(model_file_id)
+#         model_name = model.filename
+#         users = db_user.find()
+        
+#         questions = essay.get('questions', [])
+#         # question_texts = [question.get('question_text', '') for question in questions]
+        
+#         # registered_students = db_sw.find({'index_essay': index_soal})
+#         # Filter the users to exclude those who are already registered
+#         # available_students = [user for user in users if user['index'] not in [student['user_index'] for student in registered_students]]
+        
+#         if user and request.method == 'DELETE':
+#             essay_index = request.view_args.get('essay_index')
+#             db_sw.delete_one({'index_essay': essay_index, 'user_index': user_index})
+#             student_work = db_sw.find()
+#             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
+#             return render_template('admin/detailEsai.html', user_name=user_name, essay=essay, model_name=model_name, users=users, student_work=student_work, questions=questions)
+#         else:
+#             return jsonify({'error' : 'Page not found'}), 404
+#     except Exception as e:
+#         # Handle any exceptions that may occur during the process
+#         return jsonify({'error': str(e)}), 500
+
+@user_blueprint.route('/admin/detail/<index>', methods=['DELETE'])
+def delete_sw(index):
     try:
+        data = request.json
+        essay_index = str(data.get(essay_index))
+        user_index = str(data.get(user_index))
         user = db_user.find_one({'index': index})
         essay = db_essay.find_one({'index': essay_index})
         model_file_id = ObjectId(essay['model_file_id'])
@@ -945,16 +1080,54 @@ def delete_sw(index, essay_index, user_index):
             db_sw.delete_one({'index_essay': essay_index, 'user_index': user_index})
             student_work = db_sw.find()
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-            return render_template('admin/detailEsai.html', user_name=user_name, essay=essay, model_name=model_name, users=users, student_work=student_work, questions=questions)
+            return redirect(url_for('users.detail_esai', index=user['index'], user_name=user_name))
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:
         # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
     
-@user_blueprint.route('/admin/detail/<index>/<essay_index>/<user_index>', methods=['GET', 'POST'])
-def ulang_esai(index, essay_index, user_index):
+# @user_blueprint.route('/admin/detail/<index>/<essay_index>/<user_index>', methods=['GET', 'POST'])
+# def ulang_esai(index, essay_index, user_index):
+#     try:
+#         user = db_user.find_one({'index': index})
+#         essay = db_essay.find_one({'index': essay_index})
+#         users = db_user.find()
+#         questions = essay.get('questions', [])
+        
+#         if user and request.method == 'POST':
+#             essay_index = request.view_args.get('essay_index')
+#             sw = db_sw.find_one({'index_essay': essay_index, 'user_index': user_index})
+#             answer_data = sw.get('answer_data', [])
+
+#             for d in answer_data:
+#                 d['answer'] = None
+#                 d['predicted_score'] = None
+            
+#             update_value = {
+#                 'result_in_tens': None,
+#                 'answer_data':answer_data
+#             }
+            
+#             db_sw.update_one(
+#             {'index_essay': essay_index, 'user_index': user_index},
+#             {'$set': update_value}
+#             )
+#             student_work = db_sw.find()
+#             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
+#             return redirect(url_for('users.adminEsai', index=user['index'], user_name=user_name))
+#         else:
+#             return jsonify({'error' : 'Page not found'}), 404
+#     except Exception as e:
+#         # Handle any exceptions that may occur during the process
+#         return jsonify({'error': str(e)}), 500
+
+@user_blueprint.route('/admin/detail/<index>', methods=['GET', 'POST'])
+def ulang_esai(index):
     try:
+        data = request.json
+        essay_index = str(data.get(essay_index))
+        user_index = str(data.get(user_index))
         user = db_user.find_one({'index': index})
         essay = db_essay.find_one({'index': essay_index})
         users = db_user.find()
@@ -980,7 +1153,7 @@ def ulang_esai(index, essay_index, user_index):
             )
             student_work = db_sw.find()
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-            return redirect(url_for('users.adminEsai', index=user['index'], user_name=user_name))
+            return redirect(url_for('users.detail_esai', index=user['index'], user_name=user_name))
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:
