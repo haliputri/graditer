@@ -926,8 +926,8 @@ def student_work_topic(index, index_soal):
 def update_answer(index):
     try:
         data = request.json
-        index_soal = str(data.get('index_soal'))
-        user_index = str(data.get('user_index'))
+        index_soal = str(data['index_soal'])
+        user_index = str(data['user_index'])
         print(index_soal, user_index)
         question_answers = data.get('questionAnswers', [])
         user = db_user.find_one({'index': index})
@@ -1019,7 +1019,7 @@ def update_answer(index):
                 {'$set': {'result_in_tens': result_in_tens}}
             )
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0] 
-            return redirect(url_for('users.detail_esai', index=user['index'], user_name=user_name)) 
+            return redirect(url_for('users.detail_esai', index=user['index'], index_soal=index_soal, user_name=user_name)) 
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:
@@ -1059,8 +1059,8 @@ def update_answer(index):
 def delete_sw(index):
     try:
         data = request.json
-        essay_index = str(data.get(essay_index))
-        user_index = str(data.get(user_index))
+        essay_index = str(data['essay_index'])
+        user_index = str(data['user_index'])
         user = db_user.find_one({'index': index})
         essay = db_essay.find_one({'index': essay_index})
         model_file_id = ObjectId(essay['model_file_id'])
@@ -1076,11 +1076,11 @@ def delete_sw(index):
         # available_students = [user for user in users if user['index'] not in [student['user_index'] for student in registered_students]]
         
         if user and request.method == 'DELETE':
-            essay_index = request.view_args.get('essay_index')
+            # essay_index = request.view_args.get('essay_index')
             db_sw.delete_one({'index_essay': essay_index, 'user_index': user_index})
             student_work = db_sw.find()
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-            return redirect(url_for('users.detail_esai', index=user['index'], user_name=user_name))
+            return redirect(url_for('users.detail_esai', index=user['index'], index_soal=essay['index'], user_name=user_name))
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:
@@ -1126,18 +1126,19 @@ def delete_sw(index):
 def ulang_esai(index):
     try:
         data = request.json
-        essay_index = str(data.get(essay_index))
-        user_index = str(data.get(user_index))
+        # print(data)
+        essay_index = str(data['essay_index'])
+        user_index = str(data['user_index'])
+        # print(essay_index, user_index)
         user = db_user.find_one({'index': index})
         essay = db_essay.find_one({'index': essay_index})
         users = db_user.find()
         questions = essay.get('questions', [])
         
         if user and request.method == 'POST':
-            essay_index = request.view_args.get('essay_index')
+            # essay_index = request.view_args.get('essay_index')
             sw = db_sw.find_one({'index_essay': essay_index, 'user_index': user_index})
             answer_data = sw.get('answer_data', [])
-
             for d in answer_data:
                 d['answer'] = None
                 d['predicted_score'] = None
@@ -1151,9 +1152,10 @@ def ulang_esai(index):
             {'index_essay': essay_index, 'user_index': user_index},
             {'$set': update_value}
             )
+
             student_work = db_sw.find()
             user_name = user['name'] if 'name' in user and user['name'] is not None else user['email'].split('@')[0]
-            return redirect(url_for('users.detail_esai', index=user['index'], user_name=user_name))
+            return redirect(url_for('users.detail_esai', index=user['index'], index_soal=essay['index'], user_name=user_name))
         else:
             return jsonify({'error' : 'Page not found'}), 404
     except Exception as e:

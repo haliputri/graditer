@@ -476,6 +476,7 @@
         var itemId = $(this).data("item-id");
         var userId = $(this).data("user-id");
     
+        console.log(itemId, userId)
         if (confirm("Are you sure you want to restart this user?")) {
           $.ajax({
             type: "POST",
@@ -494,7 +495,7 @@
             },
           });
         }
-        location.reload();
+        //location.reload();
       });
     }); 
 
