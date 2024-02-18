@@ -1,5 +1,0 @@
-FLASK_APP=app.py
-MONGODB_DB=aes
-MONGODB_HOST=mongodb
-FLASK_ENV=development
-FLASK_RUN_HOST=0.0.0.0
