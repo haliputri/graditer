@@ -43,13 +43,12 @@ def get_model():
 model = load_model('data_A_model.h5', custom_objects={'f1': f1})
 
 def preprocess(text):
-    text = text.strip()  # Hapus spasi ekstra
-    text = text.lower()  # Konversi ke huruf kecil
-    text = re.sub('[^0-9a-zA-Z]+', ' ', text)  # Hapus karakter khusus, hanya biarkan huruf dan angka
-    text = re.sub(' +', ' ', text).strip()  # Hapus spasi berlebihan
+    text = text.strip()
+    text = text.lower()
+    text = re.sub('[^0-9a-zA-Z]+', ' ', text)
+    text = re.sub(' +', ' ', text).strip()
     return text
 
-# Load the model and metric function       
 with open('f1_metric.py', 'w') as f:
     f.write('from keras import backend as K\n\n')
     f.write('def f1(y_true, y_pred):\n')

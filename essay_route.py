@@ -91,54 +91,39 @@ def update_essay(id):
     try:
         _id = id
         _json = request.json
-
-        # Ensure _json is not None and is a dictionary
         if _json and isinstance(_json, dict):
-            update_fields = {}  # Initialize dictionary for fields to update
-
-            # Check if fields to update are present in _json
+            update_fields = {}
             if 'title' in _json:
                 update_fields['title'] = _json['title']
-
             if 'time' in _json:
                 update_fields['time'] = _json['time']
-
             if 'mata_pelajaran' in _json:
                 update_fields['mata_pelajaran'] = _json['mata_pelajaran']
-
             if 'model' in _json:
-                # Save the Keras model as binary data in GridFS
                 model = _json['model']
                 with open('temp_model.keras', 'wb') as f:
                     f.write(model)
                 with open('temp_model.keras', 'rb') as f:
                     file_id = fs.put(f, filename='temp_model.keras')
                 update_fields['model_file_id'] = str(file_id)
-
             if 'questions' in _json:
                 questions = _json['questions']
                 for question in questions:
                     if 'question_id' in question and 'text' in question:
                         question_id = question['question_id']
                         text = question['text']
-                        # Update the specific question using $set and $
                         db_essay.update_one(
                             {'_id': ObjectId(_id), 'questions.question_id': question_id},
                             {'$set': {'questions.$.text': text}}
                         )
-
-            # Update the specific essay document using $set
             db_essay.update_one({'_id': ObjectId(_id)}, {'$set': update_fields})
-
             resp = jsonify("Essay updated successfully")
             resp.status_code = 200
-
             return resp
         else:
             return jsonify({'error': 'Invalid JSON data'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @essay_blueprint.errorhandler(404)
 def not_found(error = None):
