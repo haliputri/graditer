@@ -8,33 +8,40 @@ Admin | Pengguna
 {% block body_content %}
     <body id="body-pd">
       {% include "components/navigation.html" %} 
-    <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
-      <nav class="nav">
-        <div>
-          <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
-          /></a>
-          <div class="nav_list">
-            <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link">
-              <i class="bx bx-grid-alt nav_icon"></i
-              ><span class="nav_name">Dashboard</span>
+      <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+        <nav class="nav">
+          <div>
+            <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
+              <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
+            /></a>
+            <div class="nav_list">
+              <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link">
+                <i class="bx bx-grid-alt nav_icon"></i
+                ><span class="nav_name">Dashboard</span>
+              </a>
+              <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link">
+                <i class="bx bx-message-square-detail nav_icon"></i>
+                <span class="nav_name">Essays</span>
+              </a>
+              <a
+              href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
+              class="nav_link"
+            >
+            <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
+              <span class="nav_name">Questions</span>
             </a>
-            <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link">
-              <i class="bx bx-message-square-detail nav_icon"></i>
-              <span class="nav_name">Essays</span>
-            </a>
-            <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link active">
-              <i class="bx bx-user nav_icon"></i>
-              <span class="nav_name">Users</span>
-            </a>
+              <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link active">
+                <i class="bx bx-user nav_icon"></i>
+                <span class="nav_name">Users</span>
+              </a>
+            </div>
           </div>
-        </div>
-        <a href="{{ url_for('users.login') }}" class="nav_link">
-          <i class="bx bx-log-out nav_icon"></i>
-          <span class="nav_name">SignOut</span>
-        </a>
-      </nav>
-    </div>
+          <a href="{{ url_for('users.login') }}" class="nav_link">
+            <i class="bx bx-log-out nav_icon"></i>
+            <span class="nav_name">SignOut</span>
+          </a>
+        </nav>
+      </div>
     <a href="{{ url_for('users.tambahUser', index=user['index']) }}">
       <button
       type="button"

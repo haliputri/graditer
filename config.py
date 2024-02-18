@@ -2,14 +2,24 @@ from flask import Flask, request, jsonify, render_template
 from flask_pymongo import PyMongo
 from gridfs import GridFS
 import secrets
+from flask_mail import Mail
+
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 # app.config['MONGO_URI'] = 'mongodb+srv://haliputri:1sampai8@cluster0.kkhummw.mongodb.net/aes'
 app.config['MONGO_URI'] = 'mongodb+srv://haliputri:1sampai8@graditer.smz5cee.mongodb.net/graditer'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'akunlainhali@gmail.com'
+app.config['MAIL_PASSWORD'] = 'xvzc dbpr pwhj fwxm'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
 app.secret_key = secrets.token_hex(24)
 mongo = PyMongo(app)
 mongo.init_app(app)
 fs = GridFS(mongo.db)
+
 
 db_user = mongo.db.users
 db_essay = mongo.db.essays

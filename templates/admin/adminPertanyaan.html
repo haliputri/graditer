@@ -17,30 +17,30 @@
             <i class="bx bx-grid-alt nav_icon"></i
             ><span class="nav_name">Dashboard</span>
           </a>
-          <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link active">
+          <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link">
             <i class="bx bx-message-square-detail nav_icon"></i>
-            <span class="nav_name">Esai</span>
+            <span class="nav_name">Essays</span>
           </a>
           <a
             href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
-            class="nav_link"
+            class="nav_link active"
           >
           <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
-            <span class="nav_name">Pertanyaan</span>
+            <span class="nav_name">Questions</span>
           </a>
           <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link">
             <i class="bx bx-user nav_icon"></i>
-            <span class="nav_name">Pengguna</span>
+            <span class="nav_name">Users</span>
           </a>
         </div>
       </div>
       <a href="{{ url_for('users.login') }}" class="nav_link">
         <i class="bx bx-log-out nav_icon"></i>
-        <span class="nav_name">Keluar</span>
+        <span class="nav_name">SignOut</span>
       </a>
     </nav>
   </div>
-    <a href="{{ url_for('users.tambahEsai', index=user['index']) }}">
+    <a href="{{ url_for('users.tambahSoal', index=user['index']) }}">
       <button
     type="button"
     class="btn"
@@ -51,7 +51,7 @@
       color: white;
     "
   >
-    Tambah Esai
+    Tambah Pertanyaan
   </button>
   </a>
   
@@ -59,28 +59,23 @@
     <thead>
       <tr>
         <th scope="col">No.</th>
-        <th scope="col">Topik Esai</th>
+        <th scope="col">index_soal</th>
+        <th scope="col">Soal</th>
         <th scope="col">Mata Pelajaran</th>
         <th scope="col">Aksi</th>
       </tr>
     </thead>
     <tbody>
-      {% for essay in essays %}
+      {% for question in questions %}
       <tr>
         <th scope="row">{{ loop.index }}</th>
-        <td>{{ essay.title }}</td>
-        <td>{{ essay.mata_pelajaran }}</td>
+        <td>{{ question.question_id }}</td>
+        <td>{{ question.question_text }}</td>
+        <td>{{ question.mata_pelajaran }}</td>
         <td>
             <ul class="list-inline m-0">
                 <li class="list-inline-item">
-                  <a href="{{ url_for('users.detail_esai', index=user['index'], index_soal=essay['index']) }}">
-                    <button class="btn btn-warning btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Caution">
-                      <i class="fa fa-exclamation"></i>
-                  </button>
-                </a>
-                </li>
-                <li class="list-inline-item">
-                  <a href="{{ url_for('users.edit_esai', index=user['index'], index_soal=essay['index']) }}">
+                  <a href="{{ url_for('users.edit_pertanyaan', index=user['index'], index_soal=question['question_id']) }}">
                     <button class="btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit">
                       <i class="fa fa-edit"></i>
                   </button>
@@ -92,8 +87,7 @@
                           data-toggle="tooltip"
                           data-placement="top"
                           title="Delete"
-                          data-id-delete="{{ essay.index }}"
-                          data-user-index="{{ user['index'] }}">
+                          data-id-delete="{{ question.question_id}}">
                       <i class="fa fa-trash"></i>
                   </button>
                 </li>
@@ -109,16 +103,11 @@
     $(document).ready(function () {
       $(".deleteButton").click(function () {
           var id_delete = $(this).data("id-delete");
-          var user_index = $(this).data("user-index");
-          console.log(user_index);
-          console.log(id_delete)
-          
-          if (confirm("Are you sure you want to delete this essay?")) {
+  
+          if (confirm("Are you sure you want to delete this question?")) {
               $.ajax({
-                url: "/admin/adminEsai/" + user_index,
+                  url: "{{ url_for('users.delete_soal', index=user['index'], index_soal="") }}"+id_delete ,
                   type: "DELETE",
-                  data: JSON.stringify({ index_soal: id_delete }),
-                  contentType: 'application/json;charset=UTF-8',
                   success: function (response) {
                       // Handle success (e.g., remove the deleted item from the UI)
                       console.log(response);

@@ -8,34 +8,26 @@
   <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
     <nav class="nav">
       <div>
-        <a
-          href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
-          class="nav_logo"
-        >
-          <img
-            src="{{ url_for('static', filename='logo.png') }}"
-            alt=""
-            style="height: 40px"
+        <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
         /></a>
         <div class="nav_list">
-          <a
-            href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
-            class="nav_link"
-          >
+          <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link">
             <i class="bx bx-grid-alt nav_icon"></i
             ><span class="nav_name">Dashboard</span>
           </a>
-          <a
-            href="{{ url_for('users.adminEsai', index=user['index']) }}"
-            class="nav_link active"
-          >
+          <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link active">
             <i class="bx bx-message-square-detail nav_icon"></i>
             <span class="nav_name">Essays</span>
           </a>
           <a
-            href="{{ url_for('users.adminPengguna', index=user['index']) }}"
+            href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
             class="nav_link"
           >
+          <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
+            <span class="nav_name">Questions</span>
+          </a>
+          <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link">
             <i class="bx bx-user nav_icon"></i>
             <span class="nav_name">Users</span>
           </a>
@@ -47,10 +39,7 @@
       </a>
     </nav>
   </div>
-  <!--Container Main start-->
-  <!-- <div class="height-100 bg-light">
-        <h4>Daftar Esai</h4>
-    </div> -->
+ 
   <h1 style="font-size: 28px; padding-top: 12px">Tambah Esai</h1>
   <div class="pt-2 pb-4">
     <div class="p-4" style="background-color: #f7f6fb; border-radius: 8px">
@@ -67,7 +56,7 @@
             for="mata_pelajaran"
             class="form-label"
             style="font-weight: bold"
-            >Subjek mata pelajaran <span style="color: red">*</span></label
+            >Subjek mata pelajaran<span style="color: red">*</span></label
           >
           <input
             type="text"
@@ -79,7 +68,7 @@
         </div>
         <div class="mb-3">
           <label for="title" class="form-label" style="font-weight: bold"
-            >Judul Topik <span style="color: red">*</span></label
+            >Judul Topik<span style="color: red">*</span></label
           >
           <input
             type="text"
@@ -90,7 +79,7 @@
           />
         </div>
         <label for="question" class="form-label" style="font-weight: bold"
-          >Pertanyaan terkait topik <span style="color: red">*</span></label
+          >Pertanyaan terkait topik<span style="color: red">*</span></label
         >
         <p>Harus ada minimal 1 pertanyaan agar dapat di submit</p>
         <div id="question-container-main">
@@ -337,6 +326,8 @@
             min="1"
           />
         </div>
+
+        <!--
         <div class="mb-3">
           <label for="formFile" class="form-label" style="font-weight: bold"
             >Model Jawaban<span style="color: red">*</span></label
@@ -360,6 +351,7 @@
             style="width: 100px"
           />
         </div>
+        -->
         <input
           type="submit"
           value="Submit"
@@ -380,6 +372,7 @@
           {% endfor %}
         </script>
         {% endif %} {% endwith %}
+        <!--
         <script>
           function validateFile() {
             var fileInput = document.getElementById("formFile");
@@ -395,6 +388,7 @@
             }
           }
         </script>
+        -->
       </form>
     </div>
   </div>

@@ -1,0 +1,184 @@
+{% extends "index.html" %}
+{% block title %}
+Admin | Edit Esai
+{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}" />
+{% endblock head %}
+{% block body_content %}
+<body id="body-pd">
+    {% include "components/navigation.html" %}
+    <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+      <nav class="nav">
+        <div>
+          <a
+            href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
+            class="nav_logo"
+          >
+            <img
+              src="{{ url_for('static', filename='logo.png') }}"
+              alt=""
+              style="height: 40px"
+          /></a>
+          <div class="nav_list">
+            <a
+              href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}"
+              class="nav_link"
+            >
+              <i class="bx bx-grid-alt nav_icon"></i
+              ><span class="nav_name">Dashboard</span>
+            </a>
+            <a
+              href="{{ url_for('users.adminEsai', index=user['index']) }}"
+              class="nav_link"
+            >
+              <i class="bx bx-message-square-detail nav_icon"></i>
+              <span class="nav_name">Esai</span>
+            </a>
+            <a
+            href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
+            class="nav_link active"
+          >
+          <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
+            <span class="nav_name">Pertanyaan</span>
+          </a>
+            <a
+              href="{{ url_for('users.adminPengguna', index=user['index']) }}"
+              class="nav_link"
+            >
+              <i class="bx bx-user nav_icon"></i>
+              <span class="nav_name">Pengguna</span>
+            </a>
+          </div>
+        </div>
+        <a href="{{ url_for('users.login') }}" class="nav_link">
+          <i class="bx bx-log-out nav_icon"></i>
+          <span class="nav_name">SignOut</span>
+        </a>
+      </nav>
+    </div>
+    <h1 style="font-size: 28px; padding-top: 12px">Edit Esai</h1>
+    <div class="pt-2 pb-4">
+      <div class="p-4" style="background-color: #f7f6fb; border-radius: 8px">
+        <form
+          action="{{ url_for('users.edit_pertanyaan', index=user['index'], index_soal=question['question_id']) }}"
+          method="POST"
+          class="col-12"
+          id="myForm"
+          enctype="multipart/form-data"
+          onsubmit="validateForm()"
+        >
+          <div class="mb-3">
+            <label
+              for="mata_pelajaran"
+              class="form-label"
+              style="font-weight: bold"
+              >Subjek mata pelajaran <span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="mata_pelajaran"
+              name="mata_pelajaran"
+              value="{{ question.mata_pelajaran }}"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="question" class="form-label" style="font-weight: bold"
+              >Soal<span style="color: red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="question"
+              name="question"
+              value="{{ question.question_text }}"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label" style="font-weight: bold"
+              >Model Jawaban<span style="color: red">*</span></label
+            >
+            <p>Uploaded Model : <span style="color:red;"> {{ model_name}}</span></p>
+            <input
+              class="form-control mb-3"
+              type="file"
+              id="formFile"
+              name="formFile"
+              accept=".keras, .h5"
+              onchange="validateFile()"
+            />
+            <label for="csvFile" class="form-label" style="font-weight: bold"
+            >Data Pelatihan<span style="color: red">*</span></label
+          >
+          <p>Uploaded Data : <span style="color:red;"> {{ csv_name }}</span></p>
+          <input
+            class="form-control mb-3"
+            type="file"
+            id="csvFile"
+            name="csvFile"
+            accept=".csv"
+            onchange="validateFile()"
+          />
+
+            <p>Masukan max panjang kata <span style="color: red">*</span></p>
+            <input
+              type="number"
+              id="max_length"
+              name="max_length"
+              class="form-control"
+              min="1"
+              style="width: 100px"
+              value="{{ question.max_length }}"
+            />
+          </div>
+          <input
+            type="submit"
+            value="Update"
+            class="btn"
+            style="
+              background-color: #5b4d99;
+              color: white;
+              font-weight: bold;
+              width: 100px;
+              margin-top: 16px;
+            "
+          />
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %}
+          <script>
+            {% for category, message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+          </script>
+          {% endif %} {% endwith %}
+          <script>
+            function validateFile() {
+              var fileInput = document.getElementById("formFile");
+              var fileName = fileInput.value;
+  
+              // Check if the selected file has a valid extension
+              if (
+                fileName &&
+                !(fileName.endsWith(".keras") || fileName.endsWith(".h5"))
+              ) {
+                alert("Invalid file type. Please upload a .keras or .h5 file.");
+                fileInput.value = ""; // Clear the file input
+              }
+            }
+          </script>
+        </form>
+      </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <script>
+          {% for category, message in messages %}
+              alert("{{ message }}");
+          {% endfor %}
+        </script>
+        {% endif %} {% endwith %}
+    <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
+  </body>
+{% endblock body_content %}
+

@@ -33,27 +33,31 @@ Admin | Edit Esai
               class="nav_link active"
             >
               <i class="bx bx-message-square-detail nav_icon"></i>
-              <span class="nav_name">Essays</span>
+              <span class="nav_name">Esai</span>
+            </a>
+            <a
+              href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
+              class="nav_link"
+            >
+            <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
+              <span class="nav_name">Pertanyaan</span>
             </a>
             <a
               href="{{ url_for('users.adminPengguna', index=user['index']) }}"
               class="nav_link"
             >
               <i class="bx bx-user nav_icon"></i>
-              <span class="nav_name">Users</span>
+              <span class="nav_name">Pengguna</span>
             </a>
           </div>
         </div>
         <a href="{{ url_for('users.login') }}" class="nav_link">
           <i class="bx bx-log-out nav_icon"></i>
-          <span class="nav_name">SignOut</span>
+          <span class="nav_name">Keluar</span>
         </a>
       </nav>
     </div>
-    <!--Container Main start-->
-    <!-- <div class="height-100 bg-light">
-          <h4>Daftar Esai</h4>
-      </div> -->
+
     <h1 style="font-size: 28px; padding-top: 12px">Edit Esai</h1>
     <div class="pt-2 pb-4">
       <div class="p-4" style="background-color: #f7f6fb; border-radius: 8px">
@@ -99,37 +103,47 @@ Admin | Edit Esai
           {% for q in essay.questions %}
           <div id="question-container-main">
             <div id="question-container" style="display: flex; width: 100%">
-                <div class="mb-3" style="width: 80%; display: flex">
-                  <input
-                    type="text"
-                    class="form-control ml-2"
-                    id="question"
-                    name="questions[]"
-                    value="{{ q.question_text }}"
-                  />
-                </div>
-                <div
-                  class="mb-3"
-                  style="
-                    width: 20%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-end;
-                  "
+              <div class="mb-3" style="width: 80%; display: flex">
+                <select
+                  class="form-control ml-2"
+                  id="question"
+                  name="questions[]"
+                  onchange="checkDuplicate(this)"
                 >
-                  <button
-                    type="button"
-                    class="btn"
-                    style="background-color: red; height: 100%; color: white"
-                    onclick="addRemove()"
+                {% for question in questions %}
+                  <option 
+                    value="{{ question['question_text'] }}" 
+                    data-question-id="{{ question['question_id'] }}"
+                    {% if q['question_text'] == question['question_text'] %}
+                      selected
+                    {% endif %}
                   >
-                    Remove
-                  </button>
-                </div>
+                    {{ question['question_text'] }}
+                  </option>
+                  {% endfor %}
+                </select>
               </div>
+              <div
+                class="mb-3"
+                style="
+                  width: 20%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: flex-end;
+                "
+              >
+                <button
+                  type="button"
+                  class="btn"
+                  style="background-color: red; height: 100%; color: white"
+                  onclick="addRemove()"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
           </div>
           {% endfor %}
-  
           <button
             type="button"
             class="btn"
@@ -144,6 +158,46 @@ Admin | Edit Esai
             Tambah lebih banyak +
           </button>
           <script>
+            var selectElement = document.getElementById("question");
+            var selectedValue = selectElement.value;
+            var questionId = selectedValue.getAttribute('data-question-id');
+            console.log(questionId)
+  
+            var selectedQuestions = [];
+  
+            
+            function checkDuplicate(selectElement) {
+              var selectedOption = selectElement.options[selectElement.selectedIndex];
+              var questionText = selectedOption.value;
+              var questionId = selectedOption.getAttribute('data-question-id');
+              
+              // Cek apakah opsi ini sudah dipilih sebelumnya
+              var isDuplicate = selectedQuestions.some(option => option.value === questionText);
+  
+              if (isDuplicate) {
+                alert("Soal ini sudah dipilih. Silakan pilih soal lain.");
+                selectElement.value = ""; // Reset nilai elemen select
+              } else {
+                // Simpan opsi yang baru dipilih
+                selectedQuestions.push({ value: questionText, id: questionId });
+              }
+              
+              // Menampilkan hasil di console (sesuaikan dengan kebutuhan Anda)
+              console.log("Selected Questions:", selectedQuestions);
+            }
+  
+            function updateDropdownOptions() {
+              // Update the dropdown options by removing selected questions
+              var dropdown = document.getElementById("question");
+              var options = dropdown.options;
+            
+              for (var i = options.length - 1; i >= 0; i--) {
+                if (selectedQuestions.includes(options[i].value)) {
+                  options[i].disabled = true;
+                }
+              }
+            }
+            
             function addRemove() {
               var questionContainer =
                 document.getElementById("question-container");
@@ -156,6 +210,7 @@ Admin | Edit Esai
                 questionContainer.parentNode.removeChild(questionContainer);
               }
             }
+  
             function addQuestion() {
               var questionContainer = document.getElementById(
                 "question-container-main"
@@ -167,6 +222,7 @@ Admin | Edit Esai
               newQuestionBox.style.width = "100%";
               newQuestionBox.style.marginBottom = "1rem";
   
+              /*
               var inputField = document.createElement("input");
               inputField.type = "text";
               inputField.className = "form-control ml-2";
@@ -174,32 +230,95 @@ Admin | Edit Esai
               inputField.name = "questions[]"; // Use array notation for the input name
               inputField.style.width = "80%";
               inputField.style.display = "flex";
+              */
+        
+              var selectField = document.createElement("select");
+              selectField.className = "form-control ml-2";
+              selectField.placeHolder = "Pilih Pertanyaan";
+              selectField.name = "questions[]"; // Use array notation for the input name
+              selectField.style.width = "80%";
+              selectField.style.display = "flex";
   
-              var removeButtonContainer = document.createElement("div");
-              removeButtonContainer.style.width = "20%";
-              removeButtonContainer.style.display = "flex";
-              removeButtonContainer.style.alignItems = "center";
-              removeButtonContainer.style.justifyContent = "flex-end";
+              var defaultOption = document.createElement("option");
+              defaultOption.value = "";
+              defaultOption.text = "Pilih Pertanyaan";
+              defaultOption.disabled = true;
+              defaultOption.selected = true;
+              selectField.appendChild(defaultOption);
   
-              var removeButton = document.createElement("button");
-              removeButton.type = "button";
-              removeButton.className = "btn";
-              removeButton.style.backgroundColor = "red";
-              removeButton.style.height = "100%";
-              removeButton.style.color = "white";
-              removeButton.textContent = "Remove";
+              async function fetchData() {
+                try {
+                  const response = await fetch('/api/questions');
+              
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+              
+                  const data = await response.json();
+                  return data;
+                } catch (error) {
+                  console.error('There was a problem with the fetch operation:', error);
+                }
+              }
+              
+              // Inisialisasi variabel questionOptions
+              
+              // Panggil fungsi fetchData dan tangkap hasilnya menggunakan then
+              fetchData().then(data => {
+                var question = data.questions; // Ambil hanya bagian questions dari data
+                console.log('Data from API:', question);
   
-              removeButton.addEventListener("click", function () {
-                // Remove the question box when the remove button is clicked
-                questionContainer.removeChild(newQuestionBox);
+                /*
+                var questionOptions = question.filter(q => q.question_text).map(q => q.question_text);
+                console.log('Question Options:', questionOptions);
+                var questionId = question.filter(q => q.question_id).map(q => q.question_id);
+                console.log('Question Id:', questionId);
+                */
+  
+                // Lakukan operasi lainnya di sini, contohnya
+                for (var i = 0; i < question.length; i++) {
+                  if (question[i]._id === "ques_id") {
+                    // Jika sama, skip ke iterasi berikutnya
+                    continue;
+                  }
+                  
+                  var option = document.createElement("option");
+                  option.value = question[i].question_text;
+                  option.text = question[i].question_text;
+  
+                  // Sertakan question_id sebagai atribut data
+                  option.setAttribute('data-question-id', question[i].question_id);
+  
+                  selectField.appendChild(option);
+                }
+    
+                var removeButtonContainer = document.createElement("div");
+                removeButtonContainer.style.width = "20%";
+                removeButtonContainer.style.display = "flex";
+                removeButtonContainer.style.alignItems = "center";
+                removeButtonContainer.style.justifyContent = "flex-end";
+    
+                var removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "btn";
+                removeButton.style.backgroundColor = "red";
+                removeButton.style.height = "100%";
+                removeButton.style.color = "white";
+                removeButton.textContent = "Remove";
+    
+                removeButton.addEventListener("click", function () {
+                  // Remove the question box when the remove button is clicked
+                  questionContainer.removeChild(newQuestionBox);
+                });
+    
+                newQuestionBox.appendChild(selectField);
+                removeButtonContainer.appendChild(removeButton);
+                newQuestionBox.appendChild(removeButtonContainer);
+    
+                // Append the new question box to the container
+                questionContainer.appendChild(newQuestionBox);
+                updateDropdownOptions();
               });
-  
-              newQuestionBox.appendChild(inputField);
-              removeButtonContainer.appendChild(removeButton);
-              newQuestionBox.appendChild(removeButtonContainer);
-  
-              // Append the new question box to the container
-              questionContainer.appendChild(newQuestionBox);
             }
   
             function removeQuestion(button) {
@@ -232,6 +351,7 @@ Admin | Edit Esai
               min="1"
             />
           </div>
+          <!--
           <div class="mb-3">
             <label for="formFile" class="form-label" style="font-weight: bold"
               >Model Jawaban<span style="color: red">*</span></label
@@ -255,6 +375,7 @@ Admin | Edit Esai
               value="{{ essay.max_length }}"
             />
           </div>
+          -->
           <input
             type="submit"
             value="Update"
@@ -275,6 +396,7 @@ Admin | Edit Esai
             {% endfor %}
           </script>
           {% endif %} {% endwith %}
+          <!--
           <script>
             function validateFile() {
               var fileInput = document.getElementById("formFile");
@@ -290,18 +412,10 @@ Admin | Edit Esai
               }
             }
           </script>
+          -->
         </form>
       </div>
     </div>
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %}
-        <script>
-          {% for category, message in messages %}
-              alert("{{ message }}");
-          {% endfor %}
-        </script>
-        {% endif %} {% endwith %}
-    <script src="{{ url_for('static', filename='sidebar.js') }}"></script>
   </body>
 {% endblock body_content %}
 

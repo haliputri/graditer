@@ -40,27 +40,31 @@
             class="nav_link active"
           >
             <i class="bx bx-message-square-detail nav_icon"></i>
-            <span class="nav_name">Essays</span>
+            <span class="nav_name">Esai</span>
+          </a>
+          <a
+            href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
+            class="nav_link"
+          >
+          <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
+            <span class="nav_name">Pertanyaan</span>
           </a>
           <a
             href="{{ url_for('users.adminPengguna', index=user['index']) }}"
             class="nav_link"
           >
             <i class="bx bx-user nav_icon"></i>
-            <span class="nav_name">Users</span>
+            <span class="nav_name">Pengguna</span>
           </a>
         </div>
       </div>
       <a href="{{ url_for('users.login') }}" class="nav_link">
         <i class="bx bx-log-out nav_icon"></i>
-        <span class="nav_name">SignOut</span>
+        <span class="nav_name">Keluar</span>
       </a>
     </nav>
   </div>
-  <!--Container Main start-->
-  <!-- <div class="height-100 bg-light">
-          <h4>Daftar Esai</h4>
-      </div> -->
+
   <ul class="nav nav-tabs pt-4" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
       <button
@@ -167,6 +171,82 @@
           readonly
         />
       </div>
+      <!--
+    <div
+      class="tab-pane active"
+      id="home"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+      tabindex="0"
+      style="color: #6a757b"
+    >
+      <div class="mb-3 mt-3">
+        <label for="mata_pelajaran" class="form-label" style="font-weight: bold"
+          >Subjek mata pelajaran <span style="color: red">*</span></label
+        >
+        <input
+          type="text"
+          class="form-control readonly-input"
+          id="mata_pelajaran"
+          name="mata_pelajaran"
+          value="{{ essay.mata_pelajaran }}"
+          readonly
+        />
+      </div>
+      <div class="mb-3">
+        <label for="title" class="form-label" style="font-weight: bold"
+          >Judul Topik <span style="color: red">*</span></label
+        >
+        <input
+          type="text"
+          class="form-control readonly-input"
+          id="judul_topik"
+          name="judul_topik"
+          value="{{ essay.title }}"
+          readonly
+        />
+      </div>
+      <div class="mb-3">
+        <label for="question" class="form-label" style="font-weight: bold"
+          >Pertanyaan terkait topik <span style="color: red">*</span></label
+        >
+        {% if essay.questions %} {% for question in essay.questions %}
+        <input
+          type="text"
+          class="form-control mb-3"
+          value="{{ question.question_text }}"
+          readonly
+        />
+        {% endfor %} {% else %}
+        <input
+          type="text"
+          class="form-control"
+          id="pertanyaan_topik"
+          placeholder="No questions available"
+          disabled
+        />
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        <label for="total-time" class="form-label" style="font-weight: bold"
+          >Total Waktu pengerjaan (menit):
+          <span style="color: red">*</span></label
+        >
+        <p>
+          Total waktu pengerjaan yang diberikan kepada siswa untuk mengerjakan
+          topik ini
+        </p>
+        <input
+          type="number"
+          id="total-time"
+          name="total-time"
+          class="form-control"
+          value="{{ essay.total_time }}"
+          min="1"
+          readonly
+        />
+      </div>
+      
       <div class="mb-3">
         <label for="formFile" class="form-label" style="font-weight: bold"
             >Model Jawaban<span style="color: red">*</span></label
@@ -186,6 +266,7 @@
             disabled
           />
       </div>
+      -->
     </div>
     <div
       class="tab-pane mt-2 mb-2"
@@ -207,7 +288,7 @@
           color: white;
         "
       >
-        Daftar Mahasiswa
+        Daftar Siswa
       </button>
       <div
         class="modal fade"
@@ -239,6 +320,7 @@
               method="POST"
               id="userForm"
             >
+            {{ form.hidden_tag() }}
               <div class="modal-body">
                 <div class="row" style="padding: 1rem">
                   <table>

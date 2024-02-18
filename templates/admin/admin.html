@@ -6,37 +6,41 @@
 {% block body_content %}
 <body id="body-pd">
   {% include "components/navigation.html" %} 
-<div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
-  <nav class="nav">
-    <div>
-      <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
-      /></a>
-      <div class="nav_list">
-        <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link active">
-          <i class="bx bx-grid-alt nav_icon"></i
-          ><span class="nav_name">Dashboard</span>
-        </a>
-        <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link">
-          <i class="bx bx-message-square-detail nav_icon"></i>
-          <span class="nav_name">Essays</span>
-        </a>
-        <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link">
-          <i class="bx bx-user nav_icon"></i>
-          <span class="nav_name">Users</span>
-        </a>
+  <div class="l-navbar" id="nav-bar" style="background-color: #5b4d99">
+    <nav class="nav">
+      <div>
+        <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="" style="height: 40px"
+        /></a>
+        <div class="nav_list">
+          <a href="{{ url_for('users.profile_admin_by_index', index=user['index']) }}" class="nav_link active">
+            <i class="bx bx-grid-alt nav_icon"></i
+            ><span class="nav_name">Dashboard</span>
+          </a>
+          <a href="{{ url_for('users.adminEsai', index=user['index']) }}" class="nav_link">
+            <i class="bx bx-message-square-detail nav_icon"></i>
+            <span class="nav_name">Esai</span>
+          </a>
+          <a
+              href="{{ url_for('users.adminPertanyaan', index=user['index']) }}"
+              class="nav_link"
+            >
+            <iconify-icon icon="ph:pencil-line-fill"  style="color: white"></iconify-icon>
+              <span class="nav_name">Pertanyaan</span>
+            </a>
+          <a href="{{ url_for('users.adminPengguna', index=user['index']) }}" class="nav_link">
+            <i class="bx bx-user nav_icon"></i>
+            <span class="nav_name">Pengguna</span>
+          </a>
+        </div>
       </div>
-    </div>
-    <a href="{{ url_for('users.login') }}" class="nav_link">
-      <i class="bx bx-log-out nav_icon"></i>
-      <span class="nav_name">SignOut</span>
-    </a>
-  </nav>
-</div>
-<!--Container Main start-->
-<!-- <div class="height-100 bg-light">
-        <h4>Daftar Esai</h4>
-    </div> -->
+      <a href="{{ url_for('users.login') }}" class="nav_link">
+        <i class="bx bx-log-out nav_icon"></i>
+        <span class="nav_name">Keluar</span>
+      </a>
+    </nav>
+  </div>
+
 <div style="padding-top: 2rem">
   <div class="row" style="margin-bottom: 2rem">
     <div class="card col-sm-8" style="background-color: #e4e2ed">
@@ -57,7 +61,7 @@
   <div class="row">
     <div class="card col-sm-8" style="background-color: #e4e2ed">
       <div class="card-body">
-        <h5 class="card-title">Daftar User</h5>
+        <h5 class="card-title">Daftar Pengguna</h5>
         <p class="card-text">
           Kumpulan akun pengguna yang telah didaftarkan untuk mengisi esai.
         </p>
