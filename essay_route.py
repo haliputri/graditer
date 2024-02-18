@@ -9,26 +9,18 @@ from config import fs
 
 essay_blueprint = Blueprint('essays', __name__)
 CORS(essay_blueprint)
-# crud db essay
+
 @essay_blueprint.route('/essays', methods=['GET'])
 def essays():
     essays_collection = db_essay
-
-    # Fetch all users from the collection
     essays_cursor = essays_collection.find()
-
-    # Convert the cursor to a list of dictionaries
     essays = list(essays_cursor)
-
-    # Convert ObjectId to string for JSON serialization
     for essay in essays:
         essay['_id'] = str(essay['_id'])
         
     essay_count = essays_collection.count_documents({})
 
     response_data = {'essay_count': essay_count, 'essays': essays}
-
-    # Return a JSON response containing the inserted users
     return jsonify(response_data)
 
 @essay_blueprint.route('/essays/<id>')
@@ -43,7 +35,6 @@ def get_essay_by_id(id):
         else:
             return jsonify({'error' : 'User not found'}), 404
     except Exception as e:
-        # Handle any exceptions that may occur during the process
         return jsonify({'error': str(e)}), 500
 
 @essay_blueprint.route('/create_essay', methods=['GET', 'POST'])
@@ -53,20 +44,13 @@ def create_essays():
     questions = data['questions']
     time = data['time']
     mata_pelajaran = data['mata_pelajaran']
-    
-    # Read the binary file
     with open('model.joblib', 'rb') as f:
         binary_model = Binary(f.read())
-    
     binary_model = data['model']
-
-    # Proses pertanyaan-pertanyaan
     for question in questions:
         question_id = question['id']
         question_text = question['text']
-        # Lakukan sesuatu dengan pertanyaan
-    
-    # Ensure required fields are present in the request data
+
     if 'title' and request.method == 'POST':
         result = db_essay.insert_one({'title': title, 'mata_pelajaran': mata_pelajaran, 'questions' : questions, 'time':time, 'model':binary_model })
         resp = jsonify("User added succesfully")
@@ -75,31 +59,18 @@ def create_essays():
     else:
         return not_found()
 
-
 @essay_blueprint.route('/test', methods=['POST'])
 def test_create_essays():
-    # Example data
     title = "Pertanyaan-pertanyaan mengenai topik tertentu"
     questions = [
         {"question_id": 1, "text": "Pertanyaan pertama?"},
         {"question_id": 2, "text": "Pertanyaan kedua?"},
         {"question_id": 3, "text": "Pertanyaan ketiga?"}
     ]
-
-    # Read the binary file
     model = load_model('data_A_model.h5', custom_objects={'f1': f1})
-
-    # Save the Keras model to a file path in the native Keras format
     model.save('model.keras')
-
-    # Save the Keras model as binary data in GridFS
     with open('model.keras', 'rb') as f:
         file_id = fs.put(f, filename='model.keras')
-
-    # Proses pertanyaan-pertanyaan
-    # (Your code for processing questions)
-
-    # Ensure required fields are present
     if title:
         result = db_essay.insert_one({'title': title, 'questions': questions, 'model_file_id': str(file_id)})
         resp = jsonify("Essay added successfully")
